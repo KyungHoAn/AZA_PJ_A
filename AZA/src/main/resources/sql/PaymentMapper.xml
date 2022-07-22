@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+		
+<mapper namespace="PaymentMapper">
+
+	<resultMap type="payment" id="PaymentSelectMap">
+		<result property="payCode"			 column="pay_code" 				jdbcType="NUMERIC" />
+		<result property="studentRecordNo" 	 column="student_record_no" 	jdbcType="NUMERIC" />
+		<result property="studentId" 		 column="student_id" 			jdbcType="VARCHAR" />
+		<result property="studentName" 		 column="student_name" 			jdbcType="VARCHAR" />
+		<result property="payer" 			 column="payer" 				jdbcType="VARCHAR" />
+		<result property="amount" 		  	 column="amount" 				jdbcType="NUMERIC" />
+		<result property="payDueDate" 		 column="pay_due_date" 			jdbcType="VARCHAR" />
+		<result property="payDay" 			 column="pay_day" 				jdbcType="DATE" />
+		<result property="checkPay" 		 column="check_pay" 			jdbcType="CHAR" />
+		<result property="impUid" 			 column="imp_uid" 				jdbcType="VARCHAR" />
+		
+		<association property="payLessonName"  javaType="lesson">
+			<id property="lessonName" column="lesson_name" jdbcType="VARCHAR"/>
+		</association>
+	</resultMap>
+
+
+	<!-- SQL : payment SELECT ONE -->
+	<select id="getPayment" parameterType="int" resultMap="PaymentSelectMap">
+	SELECT
+	(SELECT lesson_name FROM students_record WHERE record_code = student_record_no) lesson_name, 
+	student_name, amount, pay_due_date, pay_day, check_pay, pay_code, payer
+	FROM payment
+	WHERE pay_code = #{value}
+	</select>
+
+	<!-- SQL : payment INSERT -->
+	<insert id="addPayment" parameterType="payment">
+	INSERT INTO payment
+	VALUES(seq_payment_pay_code.NEXTVAL, #{studentRecordNo}, #{studentId},  
+	(SELECT user_name FROM users WHERE user_id = #{studentId}), #{payer:VARCHAR},
+	(SELECT fees FROM students_record WHERE record_code = #{studentRecordNo}), 
+	TO_CHAR(SYSDATE,'yyyy/mm')||'/'||(SELECT pay_due_date FROM students_record WHERE record_code = #{studentRecordNo}), 
+	#{payDay:DATE}, #{checkPay:CHAR}, #{impUid:VARCHAR})	 
+	 </insert>
+	 
+
+	<update id="updatePayment" parameterType="payment">
+	UPDATE payment 
+ 	<set>
+ 		imp_uid = #{impUid:VARCHAR},
+		check_pay = #{checkPay},
+		pay_day = SYSDATE,
+		payer = #{payer:VARCHAR}
+	</set> 
+	WHERE pay_code = #{payCode}
+	</update>
+	
+	<!-- SQL : payment DELETE -->
+	<delete id="deletePayment" parameterType="int">
+	DELETE FROM payment WHERE pay_code = #{value}
+	</delete>
+	
+	
+	<select id="listPayment" parameterType="search" resultMap="PaymentSelectMap">
+		SELECT *
+	  	FROM (	SELECT inner_table.* , ROWNUM AS row_seq
+	  					FROM		(	 SELECT
+										sr.lesson_name, p.student_name, p.amount, p.pay_due_date,p.pay_day, p.check_pay, p.pay_code, p.student_id
+										FROM payment p, students_record sr
+												<where>
+													sr.record_code = p.student_record_no
+													AND sr.lesson_name IN ( (SELECT lesson_name from lesson
+																			WHERE teacher_id = #{searchId}) )													
+												<if test="searchCondition != null">	
+													<if test="searchCondition == 0 and searchKeyword !='' ">
+										 				AND p.student_name LIKE INITCAP('%${searchKeyword}%')
+													</if>
+													<if test="searchCondition == 1 and searchStartDate !='' and searchEndDate != ''
+																and searchStartDate != null and searchEndDate != null">
+										 				AND p.pay_due_date BETWEEN TO_DATE(#{searchStartDate}, 'YYYY-MM-DD') 
+                  											AND TO_DATE(#{searchEndDate}, 'YYYY-MM-DD')
+													</if>
+													<if test="searchCondition == 2 and searchKeyword !='' ">
+										 				AND	p.check_pay LIKE INITCAP('%${searchKeyword}%')
+													</if>
+												</if>
+												</where>
+											
+											ORDER BY pay_due_date DESC) inner_table
+						WHERE ROWNUM &lt;= #{endRowNum} ) inner_table
+		WHERE row_seq BETWEEN #{startRowNum} AND #{endRowNum} 
+	
+	</select>
+	
+	
+	<select id="totalPaymentCount" parameterType="search"	 resultType="int">
+		SELECT COUNT(*)
+	  	FROM( SELECT
+				sr.lesson_name, p.student_name, p.amount, p.pay_due_date,p.pay_day, p.check_pay, p.student_id
+				FROM payment p, students_record sr
+				<where>
+					sr.record_code = p.student_record_no
+					AND sr.lesson_name IN ( (SELECT lesson_name from lesson
+											WHERE teacher_id = #{searchId}) )
+				<if test="searchCondition != null">	
+					<if test="searchCondition == 0 and searchKeyword !='' ">
+		 				AND p.student_name LIKE INITCAP('%${searchKeyword}%')
+					</if>
+					<if test="searchCondition == 1 and searchKeyword !='' ">
+		 				AND p.pay_due_date BETWEEN TO_DATE(#{searchStartDate}, 'YYYY-MM-DD') 
+          										AND TO_DATE(#{searchEndDate}, 'YYYY-MM-DD')
+					</if>
+					<if test="searchCondition == 2 and searchKeyword !='' ">
+		 				AND p.check_pay LIKE INITCAP('%${searchKeyword}%')
+					</if>	
+				</if>			    
+	 			</where>
+	 		 	) countTable
+
+	</select>
+	
+	<!-- studentList -->
+		<select id="listPaymentBystudent" parameterType="search" resultMap="PaymentSelectMap">
+		SELECT *
+	  	FROM (	SELECT inner_table.* , ROWNUM AS row_seq
+	  					FROM		(	 SELECT
+										sr.lesson_name, p.student_name, p.amount, p.pay_due_date,p.pay_day, p.check_pay, p.pay_code, p.student_id
+										FROM payment p, students_record sr
+												<where>
+													sr.record_code = p.student_record_no
+													and p.student_id = #{searchId}
+												<if test="searchCondition != null">	
+													<if test="searchCondition == 0 and searchKeyword !='' ">
+										 				AND p.student_name LIKE INITCAP('%${searchKeyword}%')
+													</if>
+													<if test="searchCondition == 1 and searchStartDate !='' and searchEndDate != ''
+																and searchStartDate != null and searchEndDate != null">
+										 				AND p.pay_due_date BETWEEN TO_DATE(#{searchStartDate}, 'YYYY-MM-DD') 
+                  											AND TO_DATE(#{searchEndDate}, 'YYYY-MM-DD')
+													</if>
+													<if test="searchCondition == 2 and searchKeyword !='' ">
+										 				AND	p.check_pay LIKE INITCAP('%${searchKeyword}%')
+													</if>
+												</if>
+												</where>
+											
+											ORDER BY pay_due_date DESC) inner_table
+						WHERE ROWNUM &lt;= #{endRowNum} ) inner_table
+		WHERE row_seq BETWEEN #{startRowNum} AND #{endRowNum} 
+	
+	</select>
+	
+	
+	<select id="totalPaymentCountBystudent" parameterType="search"	 resultType="int">
+		SELECT COUNT(*)
+	  	FROM( SELECT
+				sr.lesson_name, p.student_name, p.amount, p.pay_due_date,p.pay_day, p.check_pay, p.student_id
+				FROM payment p, students_record sr
+				<where>
+					sr.record_code = p.student_record_no
+					and p.student_id = #{searchId}
+				<if test="searchCondition != null">	
+					<if test="searchCondition == 0 and searchKeyword !='' ">
+		 				AND p.student_name LIKE INITCAP('%${searchKeyword}%')
+					</if>
+					<if test="searchCondition == 1 and searchKeyword !='' ">
+		 				AND p.pay_due_date BETWEEN TO_DATE(#{searchStartDate}, 'YYYY-MM-DD') 
+          										AND TO_DATE(#{searchEndDate}, 'YYYY-MM-DD')
+					</if>
+					<if test="searchCondition == 2 and searchKeyword !='' ">
+		 				AND p.check_pay LIKE INITCAP('%${searchKeyword}%')
+					</if>	
+				</if>			    
+	 			</where>
+	 		 	) countTable
+
+	</select>
+	
+	
+	<!--  -->
+	
+	<!-- parentList -->
+		<select id="listPaymentByParent" parameterType="search" resultMap="PaymentSelectMap">
+		SELECT *
+	  	FROM (	SELECT inner_table.* , ROWNUM AS row_seq
+	  					FROM		(	 SELECT
+										sr.lesson_name, p.student_name, p.amount, p.pay_due_date,p.pay_day, p.check_pay, p.pay_code, p.student_id
+										FROM payment p, students_record sr
+												<where>
+													sr.record_code = p.student_record_no
+													and p.student_id IN (SELECT student_id from relation
+																		WHERE parent_id=#{searchId})
+												<if test="searchCondition != null">	
+													<if test="searchCondition == 0 and searchKeyword !='' ">
+										 				AND p.student_name LIKE INITCAP('%${searchKeyword}%')
+													</if>
+													<if test="searchCondition == 1 and searchStartDate !='' and searchEndDate != ''
+																and searchStartDate != null and searchEndDate != null">
+										 				AND p.pay_due_date BETWEEN TO_DATE(#{searchStartDate}, 'YYYY-MM-DD') 
+                  											AND TO_DATE(#{searchEndDate}, 'YYYY-MM-DD')
+													</if>
+													<if test="searchCondition == 2 and searchKeyword !='' ">
+										 				AND	p.check_pay LIKE INITCAP('%${searchKeyword}%')
+													</if>
+												</if>
+												</where>
+											
+											ORDER BY pay_due_date DESC) inner_table
+						WHERE ROWNUM &lt;= #{endRowNum} ) inner_table
+		WHERE row_seq BETWEEN #{startRowNum} AND #{endRowNum} 
+	
+	</select>
+	
+	
+	<select id="totalPaymentCountByParent" parameterType="search"	 resultType="int">
+		SELECT COUNT(*)
+	  	FROM( SELECT
+				sr.lesson_name, p.student_name, p.amount, p.pay_due_date,p.pay_day, p.check_pay, p.student_id
+				FROM payment p, students_record sr
+				<where>
+					sr.record_code = p.student_record_no
+					and p.student_id IN (SELECT student_id from relation
+										WHERE parent_id=#{searchId})
+				<if test="searchCondition != null">	
+					<if test="searchCondition == 0 and searchKeyword !='' ">
+		 				AND p.student_name LIKE INITCAP('%${searchKeyword}%')
+					</if>
+					<if test="searchCondition == 1 and searchKeyword !='' ">
+		 				AND p.pay_due_date BETWEEN TO_DATE(#{searchStartDate}, 'YYYY-MM-DD') 
+          										AND TO_DATE(#{searchEndDate}, 'YYYY-MM-DD')
+					</if>
+					<if test="searchCondition == 2 and searchKeyword !='' ">
+		 				AND p.check_pay LIKE INITCAP('%${searchKeyword}%')
+					</if>	
+				</if>			    
+	 			</where>
+	 		 	) countTable
+
+	</select>
+	<!--  -->
+	
+	<insert id="addPaymentProcedure">
+	INSERT 
+	WHEN TRUNC(SYSDATE-TO_DATE(pay_due_date,'yyyy/mm/dd'),1) = 10 THEN
+	INTO payment VALUES(seq_payment_pay_code.NEXTVAL, 
+	student_record_no, 
+	student_id, 
+	student_name,
+	null,
+	amount,
+	TO_CHAR(TO_DATE(pay_due_date, 'yyyy/mm/dd') + INTERVAL '1' MONTH, 'yyyy/mm/dd') ,
+	null , 
+	'N', 
+	null) 
+	SELECT student_record_no,student_id,student_name,amount,pay_due_date FROM payment
+	</insert>
+
+</mapper>

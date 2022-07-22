@@ -1,0 +1,137 @@
+@charset "EUC-KR";
+
+@font-face {
+    font-family: 'UhBeecharming';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_five@.2.0/UhBeecharming.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'CookieRunOTF-Bold';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_twelve@1.0/CookieRunOTF-Bold00.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'ChosunBg';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-04@1.0/ChosunBg.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+html {
+  --scrollbarBG: #F5F5F5;
+  --thumbBG: #978BC0;
+}
+body::-webkit-scrollbar {
+  width: 11px;
+}
+body {
+  scrollbar-width: thin;
+  scrollbar-color: var(--thumbBG) var(--scrollbarBG);
+}
+body::-webkit-scrollbar-track {
+  background: var(--scrollbarBG);
+}
+body::-webkit-scrollbar-thumb {
+  background-color: var(--thumbBG) ;
+  border-radius: 6px;
+  border: 3px solid var(--scrollbarBG);
+}
+
+
+.titleFont{
+	font-family: 'ChosunBg';
+}
+
+.subFont {
+	font-family: 'UhBeecharming';
+	color: #9966FF;
+}
+
+
+.float{
+	position:fixed;
+	width:60px;
+	height:60px;
+	bottom:40px;
+	right:40px;
+	background-color:#0C9;
+	color:#FFF;
+	border-radius:50px;
+	text-align:center;
+	box-shadow: 2px 2px 3px #999;
+}
+
+.scroll {
+    max-height: 100px;
+    overflow-y: auto;
+}
+
+.none {
+    display: none;
+}
+
+.block {
+    display: block;
+}
+
+.hidden {
+    display: none;
+}
+
+.show {
+    display: block;
+}
+
+.divider:after,
+.divider:before {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #eee;
+}
+
+.scroll {
+    max-height: 100px;
+    overflow-y: auto;
+}
+
+#chat2 .form-control {
+    border-color: transparent;
+}
+
+#chat2 .form-control:focus {
+    border-color: transparent;
+    box-shadow: inset 0px 0px 0px 1px transparent;
+}
+
+body {
+    background-color: #f5f5f5;
+}
+
+#main-content {
+    max-width: 940px;
+    padding: 2em 3em;
+    margin: 0 auto 20px;
+    background-color: #fff;
+    border: 1px solid #e5e5e5;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+
+}
+
+.none-scroll {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+}
+.none-scroll::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera*/
+}
+
+.subPupple {
+	color: #6b5b95;
+}

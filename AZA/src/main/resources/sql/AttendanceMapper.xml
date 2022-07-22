@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="AttendanceMapper">
+
+	<resultMap id="studentsAttendanceSelectMap" type="com.aza.service.domain.Students">
+		<result property="attendanceCode" column="attendance_code" jdbcType="NUMERIC" />
+		<result property="studentId" column="student_id" jdbcType="VARCHAR" />
+		<result property="lessonCode" column="lesson_code" jdbcType="VARCHAR" />
+		<result property="attendanceDate" column="attendance_date" jdbcType="VARCHAR" />
+		<result property="attendanceState" column="attendance_state" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<!-- ATTENDANCE :: INSERT -->
+	<insert id="addStudentsAttendance">
+	INSERT INTO attendance 
+	VALUES (
+		seq_attendance_attendance_code.nextval, 
+		#{studentId},
+		#{lessonCode}, 
+		TO_CHAR(TO_DATE(#{attendanceDate}), 'yyyy/mm/dd'), 
+		#{attendanceState}
+	)	
+	</insert>
+	
+	
+	<!-- ATTENDANCE :: UPDATE -->
+	<update id="updateStudentsAttendance" parameterType="com.aza.service.domain.Alert">	
+	UPDATE attendance SET attendance_state = #{attendanceState}
+	WHERE attendance_code = #{attendanceCode}	
+	</update>
+
+
+	<!-- ATTENDANCE :: DELETE -->
+	<delete id="deleteStudentsAttendance" parameterType="int">
+	DELETE FROM attendance
+	WHERE attendance_code = #{attendanceCode}
+	</delete>
+
+
+	<!-- ATTENDANCE :: SELECT -->
+	<select id="getStudentsAttendance" parameterType="int" resultMap="studentsAttendanceSelectMap">
+	SELECT * FROM attendance
+	WHERE attendance_code = #{attendanceCode}
+	</select>
+
+
+	<!-- ATTENDANCE :: LIST -->
+	<select id="listStudentsAttendance" parameterType="search" resultMap="studentsAttendanceSelectMap">
+	SELECT * 
+	FROM (
+    SELECT inner_table.*, ROWNUM AS row_seq
+    FROM (  SELECT * FROM attendance
+            WHERE student_id = #{searchId}
+            AND attendance_date BETWEEN #{searchStartDate} || '%' AND #{searchEndDate} || '%'
+            AND lesson_code = #{lessonCode}
+            ) inner_table 
+    WHERE ROWNUM &lt;= #{endRowNum} ) inner_table
+	WHERE row_seq BETWEEN #{startRowNum} AND #{endRowNum}	
+	</select>
+	
+	
+	<!-- ATTENDACE :: totalCount -->
+	<select id="getStudentsAttendanceTotalCount" parameterType="search" resultType="int">
+	SELECT COUNT(*)
+	FROM ( SELECT * FROM attendance
+	      	WHERE student_id = #{searchId}
+	       	AND attendance_date BETWEEN #{searchStartDate} || '%' AND #{searchEndDate} || '%'
+	        AND lesson_code = #{lessonCode}
+	) countTable	
+	</select>
+
+</mapper>

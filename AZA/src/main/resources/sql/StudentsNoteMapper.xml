@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="StudentsNoteMapper">
+
+	<resultMap id="studentsNoteSelectMap" type="students">
+		<result property="noteCode" column="note_code" jdbcType="NUMERIC" />
+		<result property="studentId" column="student_id" jdbcType="VARCHAR" />
+		<result property="noteTitle" column="note_title" jdbcType="VARCHAR" />
+		<result property="noteContent" column="note_content" jdbcType="VARCHAR" />
+		<result property="noteCreateAt" column="note_create_at" jdbcType="VARCHAR" />
+	</resultMap>
+
+
+	<!-- NOTE :: INSERT -->
+	<insert id="addStudentsNote">
+		INSERT INTO Note(note_code, student_id, note_title, note_content, note_create_at)
+		VALUES(
+			seq_note_note_code.NEXTVAL,
+			#{studentId},
+			#{noteTitle},
+			#{noteContent},
+			TO_CHAR(sysdate, 'yyyy/mm/dd HH24:MI:SS')
+		)
+	</insert>
+	
+	
+	<!-- NOTE :: SELECT -->
+	<select id="getStudentsNote" parameterType="int" resultMap="studentsNoteSelectMap">
+		SELECT *
+		FROM note
+		WHERE note_code = #{noteCode}
+	</select>
+
+
+	<!-- NOTE :: UPDATE -->
+	<update id="updateStudentsNote" parameterType="students">
+	UPDATE note
+	<set>
+		NOTE_TITLE = #{noteTitle},
+		NOTE_CONTENT= #{noteContent}	
+	</set>
+	WHERE note_code = #{noteCode}
+	</update>
+	
+
+	<!-- NOTE :: DELETE  -->
+	<delete id="deleteStudentsNote">
+		DELETE FROM NOTE
+		WHERE note_code= #{noteCode}
+	</delete>
+	
+		
+	<!--  STUDENT_RECORD :: LIST - 승인 요청 중 (proposal 0) -->
+	<select id="listStudentsNote" resultMap="studentsNoteSelectMap">
+		SELECT * 
+		FROM (
+		    SELECT inner_table.*, ROWNUM AS row_seq
+		    FROM (  SELECT *
+					FROM note
+					WHERE student_id = #{searchId}
+					ORDER BY note_create_at DESC ) inner_table 
+		    WHERE ROWNUM &lt;= #{endRowNum} )
+		WHERE row_seq BETWEEN #{startRowNum} AND #{endRowNum}
+	</select>
+	
+	
+	<!-- STUDENT_RECORD :: Total Count - 승인 요청 중 (proposal 0) -->
+	<select id="getStudentsNoteTotalCount" resultType="int">
+		SELECT COUNT(*)
+		FROM ( SELECT *	FROM note
+		        WHERE student_id = #{searchId}
+		) countTable
+	</select>
+	
+</mapper>

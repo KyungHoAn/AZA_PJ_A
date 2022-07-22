@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="UserMapper">
+ 	
+ 	
+	<resultMap id="userSelectMap" type="user">
+		<result property="userId" 			column="user_id" 			jdbcType="VARCHAR"/>
+		<result property="password" 	column="password" 		jdbcType="VARCHAR" />
+		<result property="role" 				column="role" 					jdbcType="VARCHAR" />
+		<result property="userName"	column="user_name" 		jdbcType="VARCHAR" />
+		<result property="phone" 			column="phone" 		jdbcType="VARCHAR" />
+		<result property="school" 				column="school" 					jdbcType="VARCHAR" />
+		<result property="grade" 				column="grade" 					jdbcType="VARCHAR" />
+		<result property="birth" 			column="birth" 				jdbcType="CHAR"  />
+		<result property="parentPhone" 		column="parent_phone" 			jdbcType="VARCHAR" />
+		<result property="alertState" 		column="alert_state" 			jdbcType="CHAR" />
+		<result property="stopAlertStartTime" 		column="stop_alert_start_time" 			jdbcType="VARCHAR" />
+		<result property="stopAlertEndTime" 		column="stop_alert_end_time" 			jdbcType="VARCHAR" />
+		<result property="check" 		column="user_check" 			jdbcType="CHAR" />
+		
+		<association property="relationName"  javaType="user">
+			<id property="relationName" column="relation_name" jdbcType="VARCHAR"/>
+			<id property="firstStudentId" column="student_id" jdbcType="VARCHAR" />
+		</association>
+		
+	</resultMap>
+	
+	
+	<!-- USERS : INSERT -->
+	<insert 	id="addUser"		parameterType="user" >							
+		INSERT
+		INTO users(user_id,password,role,user_name,phone,school)
+		VALUES (#{userId} , #{password}, #{role}, #{userName} ,#{phone:VARCHAR}, 
+		#{school:VARCHAR})
+			
+	</insert>
+	
+	
+	<insert 	id="addUserbyParent"		parameterType="user" >							
+		INSERT ALL
+		INTO users(user_id,password,role,user_name,phone,school,grade,birth,parent_phone)
+		VALUES (#{userId} , #{password}, #{role}, #{userName} ,#{phone:VARCHAR}, 
+		#{school:VARCHAR}, #{grade:VARCHAR}, #{birth:CHAR} , #{parentPhone:VARCHAR})
+		INTO relation VALUES
+		(seq_relation_relation_code.NEXTVAL,
+		#{firstStudentId},
+		#{userId},
+		#{relationName}
+		)
+		SELECT*FROM DUAL	
+	</insert>
+	 
+	 <!-- USERS : SELECT -->
+	 <select 	id="getUser"	parameterType="String"	resultMap="userSelectMap">
+		SELECT *
+		FROM users
+		WHERE user_id = #{value}
+	 </select>
+	 
+	 <!-- USERS : UPDATE -->
+  	 <update	id="updateUser"	parameterType="user" >
+	   	UPDATE users
+	   	<set>
+	   		password = #{password},
+	   		phone = #{phone},
+	   		grade = #{grade:VARCHAR},
+	   		school = #{school:VARCHAR},
+	   	</set>
+		WHERE user_id = #{userId}
+	 </update>
+	 
+	 <!-- USERS : DELETE -->
+ 	 <delete	id="deleteUser"	parameterType="String" >
+	   	DELETE FROM users
+		WHERE user_id = #{userId} and password = #{password}
+	 </delete>
+		 
+	 <!-- USERS : CheckDuplication -->
+  	 <select id="checkDuplication" parameterType="String" resultType="int">
+	 	SELECT COUNT(user_id) 
+	 	FROM users
+	 	WHERE user_id = #{userId}
+	 </select>
+	 
+	 <select id="checkStudent" parameterType="String" resultType="int">
+	 	SELECT COUNT(user_id) 
+	 	FROM users
+	 	WHERE user_id = #{firstStudentId}
+	 </select>
+	 
+ 	 <!-- USERS : UpdateAlertState -->
+  	 <update	id="updateAlertState" >
+	   	UPDATE users
+	   	<set>
+	   		alert_state = #{alertState}
+	   	</set>
+		WHERE user_id = #{userId}
+	 </update>
+	 
+  	 <!-- USERS : UpdateStopAlertStartTime -->
+  	 <update	id="updateStopAlertStartTime" >
+	   	UPDATE users
+	   	<set>
+	   		stop_alert_start_time = #{stopAlertStartTime}
+	   	</set>
+		WHERE user_id = #{userId}
+	 </update>
+	 
+   	 <!-- USERS : UpdateStopAlertendTime -->
+  	 <update	id="updateStopAlertEndTime" >
+	   	UPDATE users
+	   	<set>
+	   		stop_alert_end_time = #{stopAlertEndTime}
+	   	</set>
+		WHERE user_id = #{userId}
+	 </update>
+	 
+	 <!-- USERS : UpdateCheck -->
+  	 <update	id="updateCheck" >
+	   	UPDATE users
+	   	<set>
+	   		user_check = #{check}
+	   	</set>
+		WHERE user_id = #{userId}
+	 </update>
+	 
+	 <select id="findId" resultMap="userSelectMap">
+		select * from users where user_name=#{userName} and phone=#{phone}
+	</select>
+	
+	<select id="findPassword" resultMap="userSelectMap">
+		select * from users where user_id=#{userId} and phone=#{phone}
+	</select>
+	
+	<update id="updatePassword">
+		update users
+		<set>
+		password=#{password}
+		</set>
+		where user_id=#{userId}
+	</update>
+	
+	<select id="checkPhone" resultMap="userSelectMap">
+		select * from users where phone=#{phone}
+	</select>
+	 
+	 
+</mapper>

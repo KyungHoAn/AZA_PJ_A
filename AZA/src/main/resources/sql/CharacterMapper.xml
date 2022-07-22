@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="CharacterMapper">
+
+	<resultMap id="studentsCharacterSelectMap" type="students">
+		<result property="characterCode" 		column="character_code" 		jdbcType="NUMERIC"/>
+		<result property="studentId" 			column="student_id" 			jdbcType="VARCHAR"/>
+		<result property="teacherId" 			column="teacher_id" 			jdbcType="VARCHAR"/>
+		<result property="characterContent" 	column="character_content" 		jdbcType="VARCHAR"/>
+		<result property="studentName" 			column="student_name" 			jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	
+
+	<!-- SQL : addCharacter INSERT -->
+	<insert id="addStudentsCharacter" parameterType="students">
+	INSERT INTO characters
+	VALUES(seq_characters_character_code.NEXTVAL, #{studentId}, #{teacherId}, #{characterContent},(SELECT user_name FROM users WHERE user_id=#{studentId}))
+      <selectKey keyProperty="characterCode" resultType="int" order="AFTER">
+        SELECT seq_characters_character_code.CURRVAL FROM DUAL
+     </selectKey>
+	</insert>
+
+	<!-- SQL : character SELECT ONE --> 	
+	<select id="getStudentsCharacter" parameterType="int" resultMap="studentsCharacterSelectMap">
+	SELECT
+	*
+	FROM characters 
+	WHERE character_code = #{value}	
+	</select>
+	
+	
+	<!-- SQL : character UPDATE -->
+	<update id="updateStudentsCharacter" parameterType="students">
+	UPDATE characters
+	<set>
+	character_content = #{characterContent}
+	</set>
+	WHERE character_code = #{characterCode}
+	</update>
+	
+	<!-- SQL : character delete -->
+	<delete id="deleteStudentsCharacter" parameterType="int">
+	DELETE FROM characters WHERE character_code = #{value}
+	</delete>
+	
+	<!-- SQL : character SELECT -->
+	<select id="listStudentsCharacter" parameterType="search" resultMap="studentsCharacterSelectMap">
+	SELECT
+	*
+	FROM characters
+	WHERE teacher_id = #{searchId}
+	ORDER BY student_name
+	</select>
+	
+	<select id="getStudentsCharacterTotalCount" parameterType="search" resultType="int">
+	SELECT COUNT(*)
+	  	FROM( SELECT
+				*
+				FROM characters
+				WHERE teacher_id = #{searchId}
+				ORDER BY student_name) countTable
+	</select>
+	
+	<!--  -->
+	<select id="getCheckStudentsCharacter" parameterType="search" resultMap="studentsCharacterSelectMap">
+		SELECT
+		*
+		FROM characters
+		WHERE teacher_id = #{searchId} AND student_id=#{searchKeyword}
+		ORDER BY student_name
+	</select>
+	
+	<select id="checkCharacterTotalCount" resultType="int">
+		SELECT COUNT(*)
+	  	FROM( SELECT
+			*
+			FROM characters
+			WHERE teacher_id = #{searchId} AND student_id=#{searchKeyword}
+			ORDER BY student_name) countTable
+	</select>
+</mapper>

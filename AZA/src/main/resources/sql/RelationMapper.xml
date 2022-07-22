@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="RelationMapper">
+
+  	
+	<resultMap id="relationSelectMap" type="user">
+		<result property="relationCode" 			column="relation_code" 			jdbcType="INTEGER"/>
+		<result property="firstStudentId" 			column="student_id" 			jdbcType="VARCHAR" />
+		<result property="userId" 					column="parent_id" 				jdbcType="VARCHAR" />
+		<result property="relationName"				column="relation_name" 			jdbcType="VARCHAR" />
+	</resultMap>
+
+	<!-- Relation : INSERT -->
+	<insert id="addRelation">
+		INSERT
+		INTO relation
+		VALUES (
+		seq_relation_relation_code.NEXTVAL,
+		#{firstStudentId},
+		#{userId},
+		#{relationName}
+		)
+	</insert>
+
+
+	<select id="getRelation" resultMap="relationSelectMap">
+		SELECT * FROM relation
+		WHERE
+		relation_code = #{relationCode}
+	</select>
+	<!-- Relation : UPDATE -->
+	<update id="updateRelation">
+
+		UPDATE relation
+		<set>
+			<if test="firstStudentId != null"> student_id = #{firstStudentId} , </if>
+			<if test="parentId != null"> parentId = #{parentId} , </if>
+			relation_name = #{relationName}
+		</set>
+		WHERE relation_code = #{relationCode}
+	</update>
+
+	<!-- Relation : DELETE -->
+	<delete id="deleteRelation" parameterType="String">
+		DELETE FROM
+		relation
+		WHERE relation_code = #{relationCode}
+	</delete>
+
+	<!-- Relation : list -student와 관계있는 parent 찾기 -->
+	<select id="listRelationByStudent" parameterType="search"
+		resultMap="relationSelectMap">
+		SELECT *
+		FROM (SELECT inner_table.*, ROWNUM AS row_seq
+		FROM ( SELECT * FROM relation
+		WHERE student_id = #{searchId}
+		<if test="searchCondition != null">
+			<where>
+				<if test="searchCondition == 6 and searchKeyword !='' ">
+					parent_id = #{searchKeyword}
+				</if>
+			</where>
+		</if>
+
+		)inner_table
+		WHERE ROWNUM &lt; = #{endRowNum})
+		WHERE row_seq BETWEEN #{startRowNum} and #{endRowNum}
+	</select>
+
+	<!-- Relation : list -parent와 관계있는 student 찾기 -->
+	<select id="listRelationByParent" parameterType="search"
+		resultMap="relationSelectMap">
+		SELECT *
+		FROM (SELECT inner_table.*, ROWNUM AS row_seq
+		FROM ( SELECT * FROM relation
+		WHERE parent_id = #{searchId}
+		<if test="searchCondition == 0 and searchKeyword !='' ">
+			student_id = #{searchKeyword}
+		</if>
+		)inner_table
+		WHERE ROWNUM &lt; = #{endRowNum})
+		WHERE row_seq BETWEEN #{startRowNum} and #{endRowNum}
+	</select>
+	
+	
+	<select id="listRelation" parameterType="search"
+		resultMap="relationSelectMap">
+		SELECT *
+		FROM (SELECT inner_table.*, ROWNUM AS row_seq
+		FROM ( SELECT * FROM relation
+		WHERE parent_id = #{searchId}
+		<if test="searchCondition == 0 and searchKeyword !='' ">
+			student_id = #{searchKeyword}
+		</if>
+		)inner_table
+		WHERE ROWNUM &lt; = #{endRowNum})
+		WHERE row_seq BETWEEN #{startRowNum} and #{endRowNum}
+	</select>
+	
+
+	<select id="getListRelationByStudentTotalCount" resultType="int">
+		SELECT COUNT(*)
+		FROM (SELECT * FROM relation
+		WHERE student_id = #{searchId}
+		<if test="searchCondition != null">
+			<where>
+				<if test="searchCondition == 6 and searchKeyword !='' ">
+					parent_id = #{searchKeyword}
+				</if>
+			</where>
+		</if> ) countTable
+	</select>
+
+	<select id="getListRelationByParentTotalCount" resultType="int">
+		SELECT COUNT(*)
+		FROM (SELECT * FROM relation
+		WHERE parent_id = #{searchId}
+		<if test="searchCondition == 0 and searchKeyword !='' ">
+			student_id = #{searchKeyword}
+		</if>) countTable
+	</select>
+	
+
+	<select id="listStudentRelationByParent" resultMap="relationSelectMap">
+		SELECT u.user_name
+				FROM RELATION R, USERS U
+				WHERE U.user_Id = R.student_id and R.parent_id = #{searchId}
+	</select>
+	
+	<select id="firstStudentIdByParent" parameterType="string" resultMap="relationSelectMap">
+		SELECT student_id FROM relation
+		WHERE parent_id = #{userId} AND ROWNUM = 1
+		ORDER BY student_id
+	</select>
+	
+	<select id="getListRelationTotalCount" resultType="int">
+		SELECT COUNT(*)
+		FROM (SELECT * FROM relation
+		WHERE parent_id = #{searchId}
+		<if test="searchCondition == 0 and searchKeyword !='' ">
+			student_id = #{searchKeyword}
+		</if>) countTable
+
+	</select>
+
+</mapper>

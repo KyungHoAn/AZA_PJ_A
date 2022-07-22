@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="EUC-KR" ?>
+
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+		
+<mapper namespace="LessonMapper">
+	<resultMap id="lessonSelectMap" type="lesson">
+		<result property="lessonCode" column="lesson_code" jdbcType="VARCHAR" />
+		<result property="teacherId" column="teacher_id" jdbcType="VARCHAR" />
+		<result property="lessonName" column="lesson_name" jdbcType="VARCHAR" />
+		<result property="lessonDay" column="lesson_day" jdbcType="VARCHAR" />
+		<result property="lessonStartTime" column="lesson_start_time" jdbcType="VARCHAR" />
+		<result property="lessonEndTime" column="lesson_end_time" jdbcType="VARCHAR" />
+		<result property="lessonPlace" column="lesson_place" jdbcType="VARCHAR" />
+		<result property="fees" column="fees" jdbcType="NUMERIC" />
+		<result property="subject" column="subject" jdbcType="VARCHAR"/>
+		<result property="lessonContent" column="lesson_content" jdbcType="VARCHAR"/>
+		<result property="lessonCreateAt" column="lesson_create_at" jdbcType="VARCHAR"/>
+		
+		<result property ="isbn" column="isbn" jdbcType="VARCHAR"/>
+		<result property ="bookTitle" column="book_title" jdbcType="VARCHAR"/>
+		<result property ="publisher" column="publisher" jdbcType="VARCHAR"/>
+		<result property ="bookPrice" column="book_price" jdbcType="VARCHAR"/>
+		<result property ="author" column="author" jdbcType="VARCHAR"/>
+		<result property ="bookYear" column="book_year" jdbcType="VARCHAR"/>
+		<result property ="bookImg" column="book_Img" jdbcType="VARCHAR"/>
+		<!-- <result property="teacherName" column="teacher_name" jdbcType="VARCHAR"/> -->
+		
+		<association property="studentId"  javaType="students">
+			<id property="studentId" column="student_id" jdbcType="VARCHAR"/>
+			<result property="proposal" column="proposal" jdbcType="CHAR"/>
+			<result property="studentName" column="student_name" jdbcType="VARCHAR"/>
+		</association>
+		<association property="teacherName"  javaType="user">
+			<id property="userName" column="user_name" jdbcType="VARCHAR"/>
+		</association>
+		
+	</resultMap>
+	
+	<resultMap id = "lessonBookSelectMap" type="lesson">
+		<result property ="isbn" column="isbn" jdbcType="VARCHAR"/>
+		<result property ="bookTitle" column="book_title" jdbcType="VARCHAR"/>
+		<result property ="publisher" column="publisher" jdbcType="VARCHAR"/>
+		<result property ="bookPrice" column="book_price" jdbcType="VARCHAR"/>
+		<result property ="author" column="author" jdbcType="VARCHAR"/>
+		<result property ="bookYear" column="book_year" jdbcType="VARCHAR"/>
+		<result property ="bookImg" column="book_Img" jdbcType="VARCHAR"/>
+		<result property="lessonName" column="lesson_name" jdbcType="VARCHAR" />
+		
+		<association property="lessonName" javaType="lesson">
+			<id property="lessonName" column="lesson_name" jdbcType="VARCHAR"/>
+			<result property="lessonCode" column="lesson_code" jdbcType="VARCHAR"/>
+		</association>
+	</resultMap>	
+
+	<!-- LESSON :: INSERT -->
+<!-- - 	<insert id="addLesson">
+		INSERT 
+		INTO LESSON		
+		VALUES (#{lessonCode}, #{teacherId}, #{lessonName}, #{lessonDay},#{lessonStartTime},
+		 #{lessonEndTime}, #{lessonPlace}, #{fees}, #{subject}, #{lessonContent:VARCHAR}, 
+		TO_CHAR(sysdate, 'yyyy/mm/dd HH24:MI:SS'))
+	</insert> -->	
+	
+	<insert id="addLesson">
+		INSERT 
+		INTO LESSON	
+		VALUES ((SELECT DBMS_RANDOM.STRING('X', 8) STR FROM DUAL),
+				(SELECT user_id FROM USERS WHERE user_id = #{teacherId}),
+		 		#{lessonName}, #{lessonDay},
+				#{lessonStartTime},#{lessonEndTime}, #{lessonPlace}, #{fees}, #{subject}, #{lessonContent:VARCHAR}, 
+				TO_CHAR(sysdate, 'yyyy/mm/dd HH24:MI:SS'))
+	</insert>
+	
+	
+	<!-- STUDENTS_RECORD :: SELECT -->
+	<select id="getLesson" parameterType="String" resultMap="lessonSelectMap">
+		SELECT * from lesson
+		where lesson_code = #{lessonCode}
+	</select>
+
+
+	<!-- STUDENTS_RECORD :: UPDATE -->
+	<update id="updateLesson">
+		UPDATE lesson
+		<set> 
+			lesson_name = #{lessonName:VARCHAR},
+			lesson_day = #{lessonDay:VARCHAR},
+			lesson_start_time = #{lessonStartTime:VARCHAR},
+			lesson_end_time = #{lessonEndTime:VARCHAR},
+			lesson_place = #{lessonPlace:VARCHAR},
+			fees = #{fees:NUMERIC},
+			subject = #{subject:VARCHAR},
+			lesson_content = #{lessonContent:VARCHAR}
+		</set>
+		WHERE lesson_code = #{lessonCode}
+	</update>
+	
+	<delete id = "lessonDeleteLessonBook">
+		DELETE FROM lesson_book
+		WHERE lesson_code = #{lessonCode}
+	</delete>
+	
+	<delete id = "deleteLesson">
+		DELETE FROM lesson 
+		WHERE lesson_code = #{lessonCode}
+	</delete>
+	
+	<select id = "listLessonTime" resultMap="lessonSelectMap">
+		select L.*
+		from lesson L
+		where L.teacher_id = #{teacherId} and L.lesson_day like '%${lessonDay}%'
+		order by L.lesson_start_time
+	</select>
+	
+	<select id = "getLessonTimeTotalCount" resultType="int">
+		SELECT COUNT(*)
+		FROM (select L.*
+			FROM lesson L
+			where L.teacher_id = #{teacherId} and L.lesson_day like '%${lessonDay}%'
+			) countTable
+	</select>
+
+	
+	<select id = "listLessonTeacher" resultMap="lessonSelectMap">
+		SELECT*
+		FROM (SELECT inner_table.*, ROWNUM AS row_seq
+			FROM (SELECT DISTINCT L.lesson_name, U.user_name, L.lesson_day, L.lesson_start_time, L.lesson_end_time,L.lesson_place, L.subject, L.lesson_code, L.lesson_create_at 
+				FROM LESSON L, USERS U
+				WHERE L.teacher_id = U.user_id AND teacher_id = #{searchId}
+				<if test='searchCondition !=null'>
+					<if test="searchCondition == 3 and searchKeyword !=''">
+						AND L.lesson_name like '%${searchKeyword}%'
+					</if>
+				</if>
+				ORDER BY L.lesson_create_at desc) inner_table
+				WHERE ROWnUM &lt;= #{endRowNum}) inner_table
+			WHERE row_seq BETWEEN #{startRowNum} and #{endRowNum}
+	</select>
+
+<!-- 선생님 아이디 필요해서 넣었어요~~ -->
+	<select id = "listLessonStudents" resultMap="lessonSelectMap">			
+		SELECT *
+		FROM (SELECT inner_table.*, ROWNUM AS row_seq		
+			FROM(
+				SELECT L.lesson_name, U.user_name, L.lesson_day, L.lesson_start_time, L.lesson_end_time, L.lesson_place, L.subject, L.lesson_code, SR.proposal, L.teacher_Id, SR.student_name
+				FROM LESSON L, STUDENTS_RECORD SR, USERS U
+				WHERE L.lesson_code = SR.lesson_code and L.teacher_id = U.user_id and SR.student_id = #{searchId}
+				<if test='searchCondition !=null'>
+					<if test="searchCondition == 3 and searchKeyword!=''">
+						AND L.lesson_name like '%${searchKeyword}%'
+					</if>
+					<if test="searchCondition == 5 and searchKeyword!=''">
+						AND U.user_name like '%${searchKeyword}%'
+					</if>
+				</if>
+				ORDER BY L.lesson_create_at desc)inner_table
+				WHERE ROWNUM &lt; = #{endRowNum} )
+			WHERE row_seq BETWEEN #{startRowNum} and #{endRowNum}
+	</select>
+	
+	<select id ="listLessonParent" resultMap = "lessonSelectMap">
+		SELECT L.*, B.student_id, B.student_name, B.user_name, B.proposal
+		FROM LESSON L, (SELECT SR.lesson_code SRL, SR.student_id student_id, SR.student_name student_name, A.UU user_name,SR.proposal proposal
+		    FROM students_record SR, (SELECT student_id SI, U.user_name UU
+		            FROM users U, relation R
+		            WHERE U.user_id = R.parent_id AND U.user_id = #{searchId}) A
+		    WHERE SR.student_id = A.SI
+				<if test='searchCondition !=null'>
+					<if test="searchCondition == 1 and searchKeyword!=''">
+						AND SR.student_name like '%${searchKeyword}%'
+					</if>
+				</if>
+		    ) B
+		WHERE L.lesson_code = B.SRL
+	</select>
+	
+	 <select id="getlistLessonParent" resultType="int">
+	 	SELECT COUNT(*)
+	 	FROM(SELECT L.*, B.student_id, B.student_name, B.user_name, B.proposal
+		FROM LESSON L, (SELECT SR.lesson_code SRL, SR.student_id student_id, SR.student_name student_name, A.UU user_name,SR.proposal proposal
+		    FROM students_record SR, (SELECT student_id SI, U.user_name UU
+		            FROM users U, relation R
+		            WHERE U.user_id = R.parent_id AND U.user_id = #{searchId}) A
+		    WHERE SR.student_id = A.SI) B
+			WHERE L.lesson_code = B.SRL
+	 	)countTable
+	 </select>
+	 
+	 <select id ="listSelectLessonName" resultMap="lessonSelectMap">
+		select L.*
+		from lesson L, students_record SR
+		where L.lesson_code = SR.lesson_code and SR.student_id = #{searchId}
+	 </select>
+	
+	<!-- SQL : SELECT ROW Count -->
+	 <select id = "getLessonTeacherTotalCount" resultType="int">
+	 		SELECT COUNT(*)
+	 		FROM( SELECT L.lesson_name, U.user_name, L.lesson_day, L.lesson_start_time, L.lesson_end_time,L.lesson_place, L.subject, L.lesson_code
+				FROM LESSON L, USERS U 
+				WHERE L.teacher_id = U.user_id  AND teacher_id = #{searchId}
+	 		<if test="searchCondition != null">
+					<if test="searchCondition == 3 and searchKeyword !='' ">
+	 					AND lesson_name like '%${searchKeyword}%'
+	 				</if>
+	 		</if> ) countTable
+	 </select>
+	 
+	 <select id = "getLessonStudentTotalCount" resultType="int">
+	 		SELECT COUNT(*)
+	 		FROM(  SELECT L.lesson_name, U.user_name, L.lesson_day, L.lesson_start_time, L.lesson_end_time, L.lesson_place, L.subject, L.lesson_code, SR.proposal, L.teacher_Id
+				FROM LESSON L, STUDENTS_RECORD SR, USERS U
+				WHERE L.lesson_code = SR.lesson_code and L.teacher_id = U.user_id and SR.student_id = #{searchId}
+	 		<if test="searchCondition != null">
+					<if test="searchCondition == 3 and searchKeyword !='' ">
+	 					AND L.lesson_name like '%${searchKeyword}%'
+	 				</if>
+	 				<if test="searchCondition == 5 and searchKeyword !='' ">
+	 					AND U.user_name like '%${searchKeyword}%'
+	 				</if>
+	 		</if> ) countTable
+	 </select>
+	 
+	 <insert id = "addLessonBook">
+		INSERT ALL
+		INTO BOOK VALUES(#{isbn},#{bookTitle},#{publisher:VARCHAR},#{bookPrice:VARCHAR},#{author:VARCHAR},#{bookYear:VARCHAR},#{bookImg:VARCHAR})
+		INTO LESSON_BOOK VALUES(SEQ_LESSON_BOOK_BOOK_CODE.nextVal,
+				(SELECT lesson_code FROM LESSON WHERE lesson_code = #{lessonCode}),#{isbn})
+		SELECT*FROM DUAL
+	</insert>
+	
+	<insert id = "addsameLessonBook">
+		INSERT
+		INTO LESSON_BOOK
+		VALUES (SEQ_LESSON_BOOK_BOOK_CODE.nextVal,
+		        (SELECT lesson_code from lesson where lesson_code = #{lessonCode}),
+		        (SELECT ISBN FROM book where isbn = #{isbn}))
+	</insert>
+	
+	<!-- conroller 에서 값 배교해서 db에 있으면 lessonCode에만 저장하자 -->
+	<insert id = "addSameLessonBook">
+		INSERT
+		INTO LESSON_BOOK
+		VALUES (SEQ_LESSON_BOOK_BOOK_CODE.nextVal,(SELECT lesson_vode FROM LESSON WHERE lesson_code = #{lessonCode}),#{isbn})
+	</insert>
+	
+	
+	<select id = "listLessonBook" resultMap ="lessonSelectMap">
+		select *
+		from (select inner_table.*, ROWNUM AS row_seq
+			FROM (SELECT B.isbn, B.book_Img, B.book_title, B.author, B.publisher, B.book_year, B.book_price, L.lesson_name, L.lesson_code
+				FROM BOOK B, LESSON_BOOK LB, LESSON L
+				WHERE B.isbn=LB.isbn AND LB.lesson_code = L.lesson_code and	L.teacher_id = #{searchId}
+				<if test='searchCondition !=null'>
+					<if test="searchCondition == 3 and searchKeyword!=''">
+						AND L.lesson_name like '%${searchKeyword}%'
+					</if>
+				</if> ) inner_table
+				WHERE ROWNUM &lt; = #{endRowNum})
+		WHERE ROW_SEQ BETWEEN #{startRowNum} AND #{endRowNum}
+	</select>
+	<!-- and L.lesson_code = 'agho1216' -->
+	
+	<select id = "listLessonBookStudents" resultMap="lessonSelectMap">
+		SELECT B.isbn, B.book_Img, B.book_title, B.author, B.publisher, B.book_year, B.book_price, A.lesson_name
+		FROM  LESSON_BOOK LB, BOOK B ,(SELECT L.lesson_code LC, L.lesson_name lesson_name
+		        FROM LESSON L, STUDENTS_RECORD SR, USERS U
+		        WHERE L.lesson_code = SR.lesson_code and L.teacher_id = U.user_id and SR.student_id = #{searchId}) A
+		WHERE A.LC = LB.lesson_code AND LB.isbn = B.isbn
+	</select>
+	
+	<select id = "listLessonBookParent" resultMap="lessonSelectMap">
+		SELECT B.*, C.lesson_name
+		FROM LESSON_BOOK LB, BOOK B, (SELECT L.lesson_code LL, L.LESSON_NAME lesson_name, B.SRN student_name
+		    FROM LESSON L, (SELECT SR.lesson_code SRL, SR.student_id SRI, SR.student_name SRN
+		        FROM students_record SR, (SELECT student_id SI
+		                FROM users U, relation R
+		                WHERE U.user_id = R.parent_id AND U.user_id = #{searchId}) A
+		        WHERE SR.student_id = A.SI) B
+		    WHERE L.lesson_code = B.SRL) C
+		WHERE LB.LESSON_CODE = C.LL AND B.ISBN = LB.ISBN
+	</select>
+	
+	<select id = "getLessonBookParentTotalCount" resultType="int">
+		SELECT COUNT(*)
+		FROM( SELECT B.*, C.lesson_name
+		FROM LESSON_BOOK LB, BOOK B, (SELECT L.lesson_code LL, L.LESSON_NAME lesson_name, B.SRN BS
+		    FROM LESSON L, (SELECT SR.lesson_code SRL, SR.student_id SRI, SR.student_name SRN
+		        FROM students_record SR, (SELECT student_id SI
+		                FROM users U, relation R
+		                WHERE U.user_id = R.parent_id AND U.user_id = #{searchKeyword}) A
+		        WHERE SR.student_id = A.SI) B
+		    WHERE L.lesson_code = B.SRL) C
+		WHERE LB.LESSON_CODE = C.LL AND B.ISBN = LB.ISBN
+		)countTable
+	</select>
+	
+	<select id = "listBookTeacher" resultMap="lessonSelectMap">
+		select*from lesson
+		where teacher_id = #{searchId}
+	</select>
+	
+	<delete id="deleteLessonBook">
+		DELETE lesson_book
+		WHERE isbn = #{isbn} and lesson_code = #{lessonCode}
+	</delete>
+	<delete id="deleteBook">
+		DELETE book
+		where isbn = #{isbn}
+	</delete>
+	
+	<select id = "getLessonBookTotalCount" resultType="int">
+	 		SELECT COUNT(*)
+	 		FROM(SELECT B.isbn, B.book_Img, B.book_title, B.author, B.publisher, B.book_year, B.book_price, L.lesson_name, L.lesson_code
+				FROM BOOK B, LESSON_BOOK LB, LESSON L
+				WHERE B.isbn=LB.isbn AND LB.lesson_code = L.lesson_code and	L.teacher_id = #{searchId}
+	 		<if test="searchCondition != null">
+					<if test="searchCondition == 3 and searchKeyword !='' ">
+	 					AND L.lesson_name like '%${searchKeyword}%'
+	 				</if>
+	 		</if> 	) countTable
+	</select>
+	
+	<select id = "getLessonBookTeacherTotalCount" resultType ="int">
+			SELECT COUNT(*)
+			FROM (select*from lesson
+				where teacher_id = #{searchKeyword}) countTable	
+	</select>
+	
+	<select id = "getLessonBookStudentsTotalCount" resultType ="int">
+		SELECT COUNT(*)
+		FROM(SELECT B.book_title, B.author, B.publisher, B.book_year, B.book_price, A.lesson_name
+			FROM  LESSON_BOOK LB, BOOK B ,(SELECT L.lesson_code LC, L.lesson_name lesson_name
+			        FROM LESSON L, STUDENTS_RECORD SR, USERS U
+			        WHERE L.lesson_code = SR.lesson_code and L.teacher_id = U.user_id and SR.student_id = #{searchKeyword}) A
+			WHERE A.LC = LB.lesson_code AND LB.isbn = B.isbn
+		)countTable	
+	</select>
+</mapper>

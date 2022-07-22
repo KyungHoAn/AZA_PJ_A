@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="QuestionMapper">
+
+	<resultMap id="questionSelectMap" type="paper">
+		<result property="questionCode" column="question_code" jdbcType="NUMERIC" />
+		<result property="quizCode" column="quiz_code" jdbcType="NUMERIC" />
+		<result property="questionNo" column="question_no" jdbcType="NUMERIC" />
+		<result property="questionContent" column="question_content" jdbcType="VARCHAR" />
+		<result property="teacherAnswer" column="teacher_answer" jdbcType="VARCHAR" />
+		<result property="studentAnswer" column="student_answer" jdbcType="VARCHAR" />
+		<result property="feedBackContent" column="feedback_content" jdbcType="VARCHAR" />
+		<result property="answerCheck" column="answer_check" jdbcType="CHAR" />
+	</resultMap>
+
+
+	<!-- PaperQuestion :: INSERT -->
+<!-- 	<insert id="addPaperQuestion">
+	INSERT INTO question
+	VALUES(
+		seq_question_question_code.NEXTVAL,
+		#{quizCode},
+		#{questionNo},
+		#{questionContent},
+		#{teacherAnswer:VARCHAR},
+		#{studentAnswer:VARCHAR},
+		#{feedBackContent:VARCHAR},
+		#{answerCheck:CHAR}
+	)
+	<selectKey keyProperty="questionCode" resultType="int" order="AFTER" >
+		SELECT seq_question_question_code.CURRVAL FROM dual
+	</selectKey>
+	</insert> -->
+	
+	<insert id="addPaperQuestion">
+		INSERT INTO question(question_code, quiz_code, question_no, question_content, teacher_answer, student_answer, feedback_content, answer_check)
+		SELECT seq_question_question_code.NEXTVAL, A.* FROM(
+		<foreach collection="list" item="paper" separator="UNION ALL">
+			SELECT #{paper.quizCode:INTEGER} as quiz_code,
+			#{paper.questionNo:INTEGER} as question_no,
+			#{paper.questionContent:VARCHAR} as question_content,
+			#{paper.teacherAnswer:VARCHAR} as teacher_answer,
+			#{paper.studentAnswer:VARCHAR} as student_answer,
+			#{paper.feedBackContent:VARCHAR} as feedback_content,
+			#{paper.answerCheck:CHAR} as answer_check
+			from dual
+		</foreach>
+		)A
+
+	<selectKey keyProperty="questionCode" resultType="int" order="AFTER" >
+		SELECT seq_question_question_code.CURRVAL FROM dual
+	</selectKey>
+	</insert>
+	
+	
+	<!-- PaperQuestion :: SELECT -->
+	<select id="getPaperQuestion" parameterType="int" resultMap="questionSelectMap">
+		SELECT
+		*
+		FROM question
+		WHERE question_code = #{questionCode}
+	</select>
+	
+	<!-- PaperQuestion :: UPDATE -->
+<!-- 	<update id="updatePaperQuestion" parameterType="paper">
+		UPDATE question
+		<set>
+			question_content = #{questionContent},
+			teacher_answer = #{teacherAnswer},
+			student_answer = #{studentAnswer},
+			answer_check = #{answerCheck},
+			feedback_content = #{feedBackContent}
+		</set>
+		WHERE question_code = #{questionCode}
+		
+	</update> -->
+	
+	<update id="updatePaperQuestion">
+		<foreach collection="list" item="paper">
+			UPDATE question
+			<set>
+				question_content = #{questionContent},
+				teacher_answer = #{teacherAnswer},
+				student_answer = #{studentAnswer},
+				answer_check = #{answerCheck},
+				feedback_content = #{feedBackContent}
+			</set>
+			WHERE question_code = #{questionCode}
+		</foreach>	
+	</update>
+	
+	<!-- PaperQuestion :: DELETE -->
+	<delete id="deletePaperQuestion" parameterType="int">
+		DELETE FROM question
+		WHERE question_code = #{questionCode}
+	</delete>
+	
+	<!-- PaperQuestion :: LIST -->
+	<select id="listPaperQuestion" resultMap="questionSelectMap">
+		SELECT
+		*
+		FROM question
+		WHERE quiz_code = #{quizCode}
+	</select>
+	
+	
+	
+	
+	<!-- FeedBack :: UPDATE -->
+	<update	id="updateFeedback">
+		UPDATE question
+		<set>
+			feedback_content = #{feedBackContent}
+		</set>
+		WHERE question_code = #{questionCode}
+	</update>
+	
+	<!-- answerCheck :: UPDATE -->
+	<update	id="updateAnswerCheck">
+		UPDATE question
+		<set>
+			answer_check = #{answerCheck}
+		</set>
+		WHERE question_code = #{questionCode}
+	</update>
+	
+	<!-- answerCheck :: UPDATE -->
+	<update	id="updateStudentAnswer">
+		UPDATE question
+		<set>
+			student_answer = #{answerCheck}
+		</set>
+		WHERE question_code = #{questionCode}
+	</update>		
+	
+	
+	
+</mapper>

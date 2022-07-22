@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+		
+
+<mapper namespace="ExamMapper">
+
+	<resultMap id="studentsExamSelectMap" type="students">
+		<result property="examCode" 			column="exam_code" 				jdbcType="NUMERIC"/>
+		<result property="studentId" 			column="student_id" 			jdbcType="VARCHAR"/>
+		<result property="examYear" 			column="exam_year"	 			jdbcType="VARCHAR"/>
+		<result property="examSemester" 		column="exam_semester" 			jdbcType="VARCHAR"/>
+		<result property="examTerm" 			column="exam_term" 				jdbcType="VARCHAR"/>
+		<result property="examSubject" 			column="exam_subject" 			jdbcType="VARCHAR"/>
+		<result property="examScore" 			column="exam_score" 			jdbcType="VARCHAR"/>
+		<result property="studentName" 			column="student_name" 			jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	
+	<!-- SQL : exam INSERT -->
+	<insert id="addStudentsExam" parameterType="students">
+	INSERT INTO exam
+	VALUES(seq_exam_exam_code.NEXTVAL, #{studentId}, #{examYear}, #{examSemester}, #{examTerm}, #{examSubject}, ${examScore},
+	(SELECT user_name FROM users WHERE user_id = #{studentId}))
+      <selectKey keyProperty="examCode" resultType="int" order="AFTER">
+        SELECT seq_exam_exam_code.CURRVAL FROM DUAL
+     </selectKey>
+	</insert>
+
+	<!-- SQL : exam SELECT ONE  -->	
+	<select id="getStudentsExam" parameterType="int" resultMap="studentsExamSelectMap">
+	SELECT
+	*
+	FROM exam 
+	WHERE exam_code = #{value}	
+	</select>
+	
+	
+	<!-- SQL : exam UPDATE -->
+	<update id = "updateStudentsExam" parameterType ="students" >
+	UPDATE exam 
+	<set>
+	exam_year = #{examYear:VARCHAR}, 
+	exam_semester = #{examSemester:VARCHAR} , 
+	exam_term = #{examTerm:VARCHAR}, 
+	exam_subject = #{examSubject:VARCHAR}, 
+	exam_score = #{examScore:VARCHAR}
+	</set>
+	WHERE exam_code = #{examCode}
+	</update>
+	
+	<!-- SQL : exam delete -->
+	<delete id="deleteStudentsExam" parameterType="int">
+	DELETE FROM exam WHERE exam_code = #{value}
+	</delete>
+	
+	
+	
+	<!--  ====================================
+	SQL : exam SELECT list -->
+		<select  id="listStudentsExam"  parameterType="search"	resultMap="studentsExamSelectMap">
+		SELECT * 
+		FROM (
+			    SELECT inner_table.*, ROWNUM AS row_seq
+			    FROM ( SELECT * FROM exam 
+						WHERE student_id = #{searchId} AND exam_subject = #{searchKeyword}
+						ORDER BY exam_subject, exam_year, exam_semester, exam_term
+				)inner_table 
+		    WHERE ROWNUM &lt;= #{endRowNum} ) inner_table
+		WHERE row_seq BETWEEN #{startRowNum} AND #{endRowNum}		
+	 </select>
+	
+	<!-- SQL : exam Total Count -->
+	<select id="getStudentsExamTotalCount"  parameterType="search" resultType="int">
+		SELECT COUNT(*)
+		FROM (  SELECT
+				*
+				FROM exam
+				WHERE student_id = #{searchId:VARCHAR} AND exam_subject = #{searchKeyword:VARCHAR}
+				ORDER BY exam_subject, exam_year, exam_semester, exam_term
+		) countTable
+	</select>
+	
+	<!-- SQL : listExamByStudent -->
+	
+	<select  id="listStudentsExamByStudent"  parameterType="search"	resultMap="studentsExamSelectMap">
+		SELECT * 
+		FROM (
+			    SELECT inner_table.*, ROWNUM AS row_seq
+			    FROM ( SELECT * FROM exam 
+						WHERE student_id = #{searchId}
+						ORDER BY exam_subject, exam_year, exam_semester, exam_term
+				)inner_table 
+		    WHERE ROWNUM &lt;= #{endRowNum} ) inner_table
+		WHERE row_seq BETWEEN #{startRowNum} AND #{endRowNum}		
+	 </select>
+	
+		<select id="getStudentsExamTotalCountByStudent"  parameterType="search" resultType="int">
+		SELECT COUNT(*)
+		FROM (  SELECT
+				*
+				FROM exam
+				WHERE student_id = #{searchId:VARCHAR}
+				ORDER BY exam_subject, exam_year, exam_semester, exam_term
+		) countTable
+	</select>
+	
+</mapper>

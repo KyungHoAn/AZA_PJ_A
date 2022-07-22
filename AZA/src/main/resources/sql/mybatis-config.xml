@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE configuration
+ 		 PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+ 		"http://mybatis.org/dtd/mybatis-3-config.dtd">
+  						
+<configuration>
+
+	<settings>
+		<setting name="callSettersOnNulls" value="false"/>
+	<!-- 	<setting name="jdbcTypeForNull" value="NULL" /> -->
+	</settings>	
+	
+
+	<typeAliases>
+		<typeAlias alias="students" type="com.aza.service.domain.Students" />
+		<typeAlias alias="search" type="com.aza.common.Search" />
+		<typeAlias alias="alert" type="com.aza.service.domain.Alert"/>
+		<typeAlias alias="lesson" type="com.aza.service.domain.Lesson" />
+		<typeAlias alias="user" type="com.aza.service.domain.User"/>
+		<!-- <typeAlias alias="book" type="com.aza.service.domain.Book"/> -->
+		<typeAlias alias="payment" type="com.aza.service.domain.Payment"/>
+		<typeAlias alias="paper" type="com.aza.service.domain.Paper"/>
+		
+		<typeAlias alias="search" type="com.aza.common.Search" />
+
+		<typeAlias alias="schedule" type="com.aza.service.domain.Schedule"/>
+		
+		<typeAlias alias="paper" type="com.aza.service.domain.Paper"/>
+	</typeAliases>
+	
+	<mappers>
+		<mapper resource="sql/StudentsRecordMapper.xml"/>
+		<mapper resource="sql/AttendanceMapper.xml"/>
+		<mapper resource="sql/AlertMapper.xml"/>
+		<mapper resource="sql/LessonMapper.xml"/>
+		<!-- <mapper resource="sql/BookMapper.xml"/> -->
+
+		<mapper resource="sql/CharacterMapper.xml"/>
+		<mapper resource="sql/ExamMapper.xml"/>
+		<mapper resource="sql/PaymentMapper.xml"/>
+		<mapper resource="sql/RelationMapper.xml"/>
+		<mapper resource="sql/UserMapper.xml"/>
+		<mapper resource="sql/ScheduleMapper.xml"/>
+		<mapper resource="sql/StudentsNoteMapper.xml"/>
+		<mapper resource="sql/QuizMapper.xml"/>
+		<mapper resource="sql/HomeworkMapper.xml"/>
+		<mapper resource="sql/QuestionMapper.xml"/>
+
+
+		<mapper resource="sql/ChoiceMapper.xml"/>
+
+	</mappers>
+
+</configuration>

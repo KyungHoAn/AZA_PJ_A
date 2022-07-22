@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+		
+<mapper namespace = "QuizMapper">
+
+	<resultMap id = "quizSelectMap" type="paper">
+		<result property ="quizCode" column="quiz_code" jdbcType="NUMERIC"/>
+		<result property ="lessonCode" column="lesson_code" jdbcType="VARCHAR"/>
+		<result property ="lessonName" column="lesson_name" jdbcType="VARCHAR" />
+		<result property ="studentId" column="student_id" jdbcType="VARCHAR"/>
+		<result property ="studentName" column="student_name" jdbcType="VARCHAR"/>
+		<result property ="quizTitle" column="quiz_title" jdbcType="VARCHAR"/>
+		<result property ="quizCreateAt" column="quiz_create_at" jdbcType="VARCHAR"/>
+		<result property ="quizSubmitDate" column="quiz_submit_date" jdbcType="DATE"/>
+		<result property ="quizScore" column="quiz_score" jdbcType="NUMERIC"/>
+		
+		<association property="teacherId"  javaType="lesson">
+			<id property="teacherId" column="teacher_id" jdbcType="VARCHAR"/>
+		</association>
+		
+<!-- 		<association property = "lessonName" javaType="lesson">
+			<id property = "lessonName" column="lesson_name" jdbcType="VARCHAR"/>
+		</association>
+		
+		<association property = "studentName" javaType="students">
+			<id property = "studentName" column="student_name" jdbcType="VARCHAR"/>
+		</association> -->
+	</resultMap>
+
+	<!-- SQL : INSERT -->
+	<insert id = "addPaperQuiz" parameterType="paper">
+	INSERT INTO quiz
+	VALUES(seq_quiz_quiz_code.NEXTVAL, (SELECT lesson_code FROM lesson WHERE lesson_name = #{lessonName:VARCHAR}), #{lessonName:VARCHAR}, 
+	(SELECT user_id FROM users WHERE user_name = #{studentName:VARCHAR}), #{studentName:VARCHAR}, #{quizTitle:VARCHAR}, TO_DATE(sysdate, 'yyyy/mm/dd HH24:MI:SS'), 
+	#{quizSubmitDate:DATE}, #{quizScore:NUMERIC})
+	<selectKey keyProperty="quizCode" resultType="int" order="AFTER" >
+		SELECT seq_quiz_quiz_code.CURRVAL FROM dual
+	</selectKey>
+	</insert>
+	
+	<!-- SQL : SELECT ONE -->
+	<select id="getPaperQuiz" resultMap="quizSelectMap">
+	SELECT *
+	FROM quiz
+	WHERE quiz_code = #{quizCode}
+	</select>
+	
+	<!-- SQL : UPDATE -->
+	<update id = "updatePaperQuiz" parameterType ="paper">
+	UPDATE quiz 
+	<set>
+	lesson_name = #{lessonName:VARCHAR},
+	student_name = #{studentName:VARCHAR},
+	quiz_title = #{quizTitle:VARCHAR},
+	quiz_submit_date = #{quizSubmitDate:DATE}, 
+	quiz_score = #{quizScore:NUMERIC} 
+	</set>
+	WHERE quiz_code = #{quizCode}
+	</update>
+
+	<!-- SQL : DELETE	 -->
+	<delete id="deletePaperQuiz" parameterType="int">
+	DELETE FROM quiz WHERE quiz_code = #{value}
+	</delete>
+	
+	<!-- SQL : LIST  -->
+<!-- 	<select id="listPaperQuizTeacher" parameterType="search" resultMap="quizSelectMap">
+	SELECT * 
+	FROM (
+    SELECT inner_table.*, ROWNUM AS row_seq
+    FROM ( SELECT
+			quiz_code, (SELECT lesson_name FROM lesson WHERE lesson_code = #{searchKeyword}) lessonName,
+			(SELECT user_name FROM users WHERE user_id = student_id), quiz_create_at, quiz_submit_date, quiz_score
+			FROM quiz
+			WHERE lesson_code = #{searchKeyword} 
+			ORDER BY quiz_create_at DESC ) inner_table 
+		WHERE ROWNUM &lt;= #{endRowNum} )
+	WHERE row_seq BETWEEN #{startRowNum} AND #{endRowNum}
+	</select> -->
+	
+<!-- 	<select id="listPaperQuizTeacher" parameterType="search" resultMap="quizSelectMap">
+		SELECT * 
+		FROM ( SELECT inner_table.*, ROWNUM AS row_seq
+	   		 FROM ( SELECT
+				q.quiz_code, sr.lesson_name, q.quiz_title, sr.student_name,
+				q.quiz_create_at, q.quiz_submit_date, q.quiz_score
+				FROM quiz q, students_record sr, lesson l
+					<where>
+					q.student_id = sr.student_id AND sr.lesson_code = l.lesson_code AND l.teacher_id = #{searchId}
+						<if test='searchCondition != null'>
+							<if test="searchCondition == 0 and searchKeyword != '' ">
+								AND sr.lesson_name LIKE '%' || #{searchKeyword} || '%'
+							</if>
+							<if test="searchCondition == 1 and searchKeyword != '' ">
+								AND sr.student_name LIKE '%' || #{searchKeyword} || '%'
+							</if>
+						</if>	
+					</where>
+				ORDER BY q.quiz_create_at desc ) inner_table 
+			WHERE ROWNUM &lt;= #{endRowNum} )
+		WHERE row_seq BETWEEN #{startRowNum} AND #{endRowNum}
+	</select> -->
+	<select id="listPaperQuizTeacher" parameterType="search" resultMap="quizSelectMap">
+		SELECT * 
+		FROM ( SELECT inner_table.*, ROWNUM AS row_seq
+	   		 FROM ( SELECT
+					q.quiz_code, q.lesson_name, q.quiz_title, q.student_name,
+					q.quiz_create_at, q.quiz_submit_date, q.quiz_score
+					FROM quiz q, lesson l
+					<where>
+					q.lesson_code = l.lesson_code AND l.teacher_id = #{searchId}
+						<if test='searchCondition != null'>
+							<if test="searchCondition == 0 and searchKeyword != '' ">
+								AND q.lesson_name LIKE '%' || #{searchKeyword} || '%'
+							</if>
+							<if test="searchCondition == 1 and searchKeyword != '' ">
+								AND q.student_name LIKE '%' || #{searchKeyword} || '%'
+							</if>
+						</if>	
+					</where>
+				ORDER BY q.quiz_create_at desc ) inner_table 
+			WHERE ROWNUM &lt;= #{endRowNum} )
+		WHERE row_seq BETWEEN #{startRowNum} AND #{endRowNum}
+	</select>
+	
+<!-- 	<select id="listPaperQuizStudent" parameterType="search" resultMap="quizSelectMap">
+	SELECT * 
+	FROM (
+    SELECT inner_table.*, ROWNUM AS row_seq
+    FROM ( SELECT
+			quiz_code, (SELECT lesson_name FROM lesson WHERE lesson_code = #{searchKeyword}) lessonName,
+			(SELECT user_name FROM users WHERE user_id = student_id), quiz_create_at, quiz_submit_date, quiz_score
+			FROM quiz
+			WHERE lesson_code = #{searchKeyword} 
+			AND student_id = #{searchId:VARCHAR}
+			ORDER BY quiz_create_at DESC ) inner_table 
+		WHERE ROWNUM &lt;= #{endRowNum} )
+	WHERE row_seq BETWEEN #{startRowNum} AND #{endRowNum}
+	</select> -->
+
+	<select id="listPaperQuizStudent" parameterType="search" resultMap="quizSelectMap">
+		SELECT * 
+		FROM ( SELECT inner_table.*, ROWNUM AS row_seq
+	    FROM ( SELECT
+				q.quiz_code, sr.lesson_name, q.quiz_title, sr.student_name,
+				q.quiz_create_at, q.quiz_submit_date, q.quiz_score
+				FROM quiz q, students_record sr
+					<where>
+					q.student_id = sr.student_id AND sr.student_id = #{searchId}
+						<if test='searchCondition != null'>
+							<if test="searchCondition == 0 and searchKeyword != '' ">
+								AND sr.lesson_name LIKE '%' || #{searchKeyword} || '%'
+							</if>
+						</if>
+					</where>
+				ORDER BY q.quiz_create_at desc ) inner_table 
+			WHERE ROWNUM &lt;= #{endRowNum} )
+		WHERE row_seq BETWEEN #{startRowNum} AND #{endRowNum}
+	</select>	
+	
+	<!--  SQL : TOTAL COUNT	 -->
+<!-- 	<select id="getPaperQuizTotalCountTeacher"  parameterType="search" resultType="int">
+		SELECT COUNT(*)
+		FROM (  SELECT
+				*
+				FROM quiz
+				WHERE lesson_code = #{searchKeyword}				
+		) countTable
+	</select> -->
+	
+	<select id="getPaperQuizTotalCountTeacher"  parameterType="search" resultType="int">
+		SELECT COUNT(*)
+		FROM (   SELECT
+					q.quiz_code, q.lesson_name, q.quiz_title, q.student_name,
+					q.quiz_create_at, q.quiz_submit_date, q.quiz_score
+					FROM quiz q, lesson l
+					<where>
+					q.lesson_code = l.lesson_code AND l.teacher_id = #{searchId}
+						<if test='searchCondition != null'>
+							<if test="searchCondition == 0 and searchKeyword != '' ">
+								AND q.lesson_name LIKE '%' || #{searchKeyword} || '%'
+							</if>
+							<if test="searchCondition == 1 and searchKeyword != '' ">
+								AND q.student_name LIKE '%' || #{searchKeyword} || '%'
+							</if>
+						</if>	
+					</where>
+				ORDER BY q.quiz_create_at desc				
+		) countTable
+	</select>
+
+	<select id="getPaperQuizTotalCountStudent"  parameterType="search" resultType="int">
+		SELECT COUNT(*)
+		FROM (  SELECT
+				q.quiz_code, sr.lesson_name, q.quiz_title, sr.student_name,
+				q.quiz_create_at, q.quiz_submit_date, q.quiz_score
+				FROM quiz q, students_record sr
+					<where>
+					q.student_id = sr.student_id AND sr.student_id = #{searchId}
+						<if test='searchCondition != null'>
+							<if test="searchCondition == 0 and searchKeyword != '' ">
+								AND sr.lesson_name LIKE '%' || #{searchKeyword} || '%'
+							</if>
+						</if>
+					</where>
+				ORDER BY q.quiz_create_at desc
+		) countTable
+	</select>
+
+</mapper>

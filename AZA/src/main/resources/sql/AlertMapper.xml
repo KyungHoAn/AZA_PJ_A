@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="AlertMapper">
+
+	<resultMap id="alertSelectMap" type="alert">
+		<result property="alertCode" column="alert_code" jdbcType="NUMERIC" />
+		<result property="receiverId" column="receiver_id" jdbcType="VARCHAR" />
+		<result property="lessonCode" column="lesson_code" jdbcType="VARCHAR" />
+		<result property="alertContent" column="alert_content" jdbcType="VARCHAR" />
+		<result property="alertCreateAt" column="alert_create_at" jdbcType="VARCHAR" />
+		<result property="alertReadAt" column="alert_read_at" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<!-- INSERT : Basic -->
+	<insert id="addAlert">
+	INSERT INTO alert VALUES (
+		seq_alert_alert_code.nextval,
+		#{receiverId},
+		#{lessonCode},
+		(SELECT ('[ ' || v.l_name || ' ] ' || v.s_name || #{alertContent}) CONTENT
+    		FROM LESSON, (SELECT l.lesson_name l_name, u.user_name s_name 
+    						FROM LESSON l, USERS u 
+    						WHERE l.lesson_code = #{lessonCode} AND u.user_id = #{receiverId}) v), 
+		TO_CHAR(sysdate, 'yyyy/mm/dd HH24:MI:SS'), 
+    	null
+	)	
+	</insert>
+
+	<insert id="addAlertAttendance">
+	INSERT INTO alert VALUES (
+    	seq_alert_alert_code.nextval, 
+		#{receiverId},
+    	#{lessonCode},
+    	(SELECT ('[ ' || lesson_name || ' ] ' || student_name || #{alertContent}) CONTENT
+   			FROM students_record
+			where lesson_code = #{lessonCode} AND student_id = #{studentId}),
+    	TO_CHAR(sysdate, 'yyyy/mm/dd HH24:MI:SS'),
+    	null
+    	)
+	</insert>
+	
+	
+	<insert id="addAlertPayment">
+	INSERT 
+	WHEN TRUNC(SYSDATE-TO_DATE(pay_due_date,'yyyy/mm/dd'),1) = 7 THEN
+	INTO alert VALUES(seq_alert_alert_code.NEXTVAL, 
+	receiver_id , 
+	lesson_code, 
+	(SELECT ('[ ' || subject   || ' ] ' || lesson_name  || ' 수납일 7일전 입니다.') CONTENT
+    		FROM LESSON),
+	TO_CHAR(sysdate, 'yyyy/mm/dd HH24:MI:SS'),
+    null    
+	) 
+	SELECT * FROM alert, payment
+	</insert>
+	
+	<select id="getAlertPayment"> 
+	SELECT * FROM alert
+	WHERE receiver_id = #{receiver_id}
+	</select>
+	
+	<select id="getAlertByDate">
+	<![CDATA[ SELECT * FROM alert
+	WHERE TO_DATE(sysdate, 'YYYY/MM/DD') -  
+       TO_DATE(alert_create_at, 'YYYY/MM/DD') < 8
+       ]]>
+	</select>
+
+	<!-- READ -->
+	<update id="readAlert" parameterType="int">
+	UPDATE alert 
+	SET alert_read_at = TO_CHAR(sysdate, 'yyyy/mm/dd HH24:MI:SS')
+	WHERE alert_code = #{alertCode}
+	</update>
+	
+	
+	<!-- SELECT : get -->
+	<select id="getAlert" parameterType="int" resultMap="alertSelectMap">
+	SELECT * FROM alert
+	WHERE alert_code = #{alertCode}
+	</select>
+	
+	
+	<!-- DELETE -->
+	<delete id="deleteAlert" parameterType="int">
+	DELETE FROM alert
+	WHERE alert_code = #{alertCode}
+	</delete>
+	
+
+	<!-- LIST -->
+	<select id="listAlert" parameterType="search" resultMap="alertSelectMap">
+	SELECT * 
+	FROM ( SELECT inner_table.*, ROWNUM AS row_seq
+    		FROM (  SELECT * FROM alert
+            		WHERE receiver_id = #{searchId}
+            		<if test="searchCondition == 0">
+            		AND alert_read_at IS NULL
+            		</if>
+            		ORDER BY  alert_create_at DESC 
+            		) inner_table 
+    		WHERE ROWNUM &lt;= #{endRowNum} )
+	WHERE row_seq BETWEEN #{startRowNum} AND #{endRowNum}
+	</select>
+	
+	<!-- Total Count -->
+	<select id="getAlertTotalCount" resultType="int">
+	SELECT COUNT(*)
+	FROM ( SELECT *	FROM alert
+        	WHERE receiver_id = #{searchId}
+        	<if test="searchCondition == 0">
+            AND	alert_read_at IS NULL
+        	</if>
+        	ORDER BY  alert_create_at DESC
+			) countTable
+	
+	</select>
+	
+</mapper>
