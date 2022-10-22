@@ -15,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -129,12 +130,7 @@ public class LessonController {
    }
    
    @RequestMapping(value="getLesson/{lessonCode}", method = RequestMethod.GET)
-//   @RequestMapping(value="getLesson")
    public ModelAndView getLesson(@PathVariable String lessonCode) throws Exception{
-//   public ModelAndView getLesson(@RequestParam("lessonCode") String lessonCode) throws Exception{
-      System.out.println("==========");
-      System.out.println("getLesson start.....");
-      System.out.println("==========");
       
       ModelAndView model = new ModelAndView();
       Lesson lesson = lessonService.getLesson(lessonCode);
@@ -143,23 +139,6 @@ public class LessonController {
       model.setViewName("/lesson/getLesson");
       return model;
    }
-   
-//   @RequestMapping(value="getLesson/{lessonCode}", method=RequestMethod.GET)
-////   @RequestMapping(value="getLesson")
-//   public ModelAndView getLesson(@PathVariable("lessonCode") String lessonCode) throws Exception{
-////   public ModelAndView getLesson(@RequestParam("lessonCode") String lessonCode) throws Exception{
-//      System.out.println("==========");
-//      System.out.println("getLesson start.....");
-//      System.out.println("==========");
-//      
-//      ModelAndView model = new ModelAndView();
-//      Lesson lesson = lessonService.getLesson(lessonCode);
-//      
-////      model.addObject("lesson", lesson);
-//      model.setViewName("/lesson/getLesson");
-//      model.addObject("lesson", lesson);
-//      return model;
-//   }
    
    // 수업 수정
    @RequestMapping(value="updateLessonView", method=RequestMethod.GET)
@@ -219,13 +198,7 @@ public class LessonController {
    //      System.out.println(teacherId);
          
          Map<String, Object> lessonName = lessonService.listBookTeacher(search, teacherId);
-//         System.out.println("================");
-//         System.out.println(lessonName);
-//         System.out.println("================");
          Map<String, Object> map = lessonService.listLessonBook(search, teacherId);
-//         System.out.println("================");
-//         System.out.println(map);
-//         System.out.println("================");
          
          Page resultPage = new Page(search.getCurrentPage(),
                ((Integer)map.get("totalCount")).intValue(),pageUnit,pageSize);
@@ -275,57 +248,20 @@ public class LessonController {
       }
    }
    
-   @RequestMapping(value="deleteLessonBook",method = RequestMethod.GET)
-   public ModelAndView deleteLessonBook(@RequestParam("lessonCode") String lessonCode,@RequestParam("isbn") String isbn,HttpServletRequest request) throws Exception{
+//   @RequestMapping(value="deleteLessonBook", method= {RequestMethod.GET, RequestMethod.POST})
+   @ResponseBody
+   @PostMapping(value="deleteLessonBook")
+   public void deleteLessonBook(@RequestParam Map<String, Object> params,HttpServletRequest request) throws Exception{
+	  System.out.println("deleteLessonBook Controller");
+	  System.out.println(params);      
+	  
+      String isbn = (String) params.get("isbn");
+      String lessonCode = (String) params.get("lessonCode");
       
-      System.out.println(isbn);
-      System.out.println(lessonCode);
-      System.out.println("===========");
-      System.out.println("===========");System.out.println("===========");
-      
-      
-      System.out.println("===========");
-      System.out.println("deleteLessonBook Controller");
-      String is = request.getParameter("isbn");
-//      String lessonCode = request.getParameter("lessonCode");
-      System.out.println(is);
-      String isbn1 = request.getParameter("isbn");
-      String lessonCode1 = request.getParameter("lessonCode");
-      System.out.println(lessonCode1);
-      
-      lessonService.deleteLessonBook(isbn1, lessonCode1);
-      ModelAndView model = new ModelAndView();
-      model.setViewName("redirect:/lesson/manageLessonBook");
-      
-      return model;
+      lessonService.deleteLessonBook(isbn, lessonCode);
    }
    
-//   @RequestMapping(value="deleteLessonBook",method = RequestMethod.POST)
-//   public ModelAndView deleteLessonBook(@ModelAttribute("lesson") Lesson lesson,HttpServletRequest request) throws Exception{
-//      String isb = lesson.getIsbn();
-//      String lessonC = lesson.getLessonCode();
-//      System.out.println(isb);
-//      System.out.println(lessonC);
-//      System.out.println("===========");
-//      System.out.println("===========");System.out.println("===========");
-//      
-//      
-//      System.out.println("===========");
-//      System.out.println("deleteLessonBook Controller");
-//      String is = request.getParameter("isbn");
-////      String lessonCode = request.getParameter("lessonCode");
-//      System.out.println(is);
-//      String isbn1 = request.getParameter("isbn");
-//      String lessonCode1 = request.getParameter("lessonCode");
-//      System.out.println(lessonCode1);
-//      
-//      lessonService.deleteLessonBook(isbn1, lessonCode1);
-//      ModelAndView model = new ModelAndView();
-//      model.setViewName("redirect:/lesson/manageLessonBook");
-//      
-//      return model;
-//   }
-   
+   //ChatBot
    @RequestMapping("1")
    public ModelAndView chatbot() throws Exception{
       ModelAndView model = new ModelAndView();

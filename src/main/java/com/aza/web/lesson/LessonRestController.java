@@ -51,8 +51,6 @@ public class LessonRestController {
    @RequestMapping(value = "listLesson", method = RequestMethod.POST)
    @ResponseBody
    public Map<String, Object> listLesson(@ModelAttribute("search") Search search, HttpSession session) throws Exception{
-      
-      System.out.println("rest/listLesson -> 시작");
       String role = ((User)session.getAttribute("user")).getRole();
       
       if(role.equals("teacher")) {
@@ -62,9 +60,6 @@ public class LessonRestController {
          System.out.println(totalCount);
          search.setCurrentPage(1);
          search.setPageSize(50);
-         System.out.println("<===========");
-         System.out.println(lessonService.listLessonTeacher(search, teacherId));
-         System.out.println("===========>");
          
          session.setAttribute("role", role);
          
@@ -101,17 +96,12 @@ public class LessonRestController {
       }
       return true;
    }
+   
    //@RequestParam(required = false, value = "lessonCode") String lessonCode,
    @RequestMapping(value="addLessonBook", method=RequestMethod.POST)
    public ModelAndView addLessonBook(@RequestParam(required = false,value="lessonCode") String lessonCode, HttpServletRequest request) throws Exception{
-      System.out.println("rest addLessonBook Controller 실행");
       ModelAndView model = new ModelAndView();
       String isbn = request.getParameter("isbn");
-//      String lessonCode = request.getParameter("lessonCode");
-      System.out.println("=========");
-      System.out.println("isbn=> "+isbn);
-      System.out.println("lessonCode=> "+lessonCode);
-      System.out.println("=========");
       
       Lesson lesson = new Lesson();
       try {
@@ -128,7 +118,6 @@ public class LessonRestController {
          List<Map<String,Object>> items = (List<Map<String, Object>>) result.get("result");
          
          for(Map<String,Object> item : items) {
-            System.out.println("===============================");
             for(String field : fields) {
                System.out.println(field+"->"+item.get(field));
                if(field.equals("title")) {
@@ -158,9 +147,6 @@ public class LessonRestController {
                lesson.setLessonCode(lessonCode);
                lesson.setIsbn(isbn);
             }
-            System.out.println("==========");
-            System.out.println(lesson);
-               System.out.println("==========");
          }         
 //         System.out.println(response);
       } catch (Exception e) {
@@ -170,8 +156,6 @@ public class LessonRestController {
       try {
          lessonService.addLessonBook(lesson);
       } catch (Exception e){
-         System.out.println("<<<<<<<<>>>>>>>>");
-         System.out.println("lesson_book 에 저장");
          lessonService.addSameLessonBook(lessonCode, isbn);
       }
       model.setViewName("redirect:/lesson/manageLessonBook");
@@ -193,61 +177,6 @@ public class LessonRestController {
       return lessonService.listLessonBook(search, teacherId);
    }
    
-   
-   
-//   @RequestMapping(value="manageLessonBook")
-//   public Map<String, Object> manageLessonBook(@ModelAttribute("search") Search search, HttpSession session) throws Exception{
-//
-//      //lesson code와 lessonName 가져와야함      
-//      System.out.println("manageLessonBook실행");
-//      if(search.getCurrentPage()==0) {
-//         search.setCurrentPage(1);
-//      }
-//      search.setPageSize(pageSize);
-////      String role = ((User) session.getAttribute("user")).getRole();
-//            
-//      String teacherId = ((User) session.getAttribute("user")).getUserId();
-//      
-//      Map<String, Object> lessonName = lessonService.listBookTeacher(teacherId);
-//      
-//      Map<String, Object> map = lessonService.listLessonBook(search, teacherId);
-//      
-//      Page resultPage = new Page(search.getCurrentPage(),
-//            ((Integer)map.get("totalCount")).intValue(),pageUnit,pageSize);
-//      
-//      ModelAndView model = new ModelAndView();
-//      model.setViewName("/lesson/manageLessonBook");
-//      model.addObject("book",lessonName.get("book"));
-//      model.addObject("list",map.get("list"));
-//      model.addObject("resultPage",resultPage);
-//      model.addObject("search",search);
-//      System.out.println(model);
-//
-//      return null;
-//   }
-
-   @RequestMapping(value = "deleteLessonBook", method = RequestMethod.GET)
-   public void deleteLessonBook(@RequestParam(value="isbn", required=false) String isbn, @RequestParam(value="lessonCode",required=false) String lessonCode, HttpServletRequest request) throws Exception{
-      System.out.println("===========");
-      System.out.println("deleteLessonBook restController");
-      System.out.println("===========");
-      String is = request.getParameter("isbn");
-      System.out.println(is);
-      System.out.println("===========");
-//      String lessonCode = request.getParameter("lessonCode");
-//      System.out.println(isbn);
-      
-      lessonService.deleteLessonBook(is, lessonCode);
-   }
-   
-//   @RequestMapping(value = "deleteLessonBook")
-//   public void deleteLessonBook(@RequestParam(value="isbn") String isbn) throws Exception{
-//      System.out.println("===========");
-//      System.out.println("deleteLessonBook restController");
-//      System.out.println("===========");
-//      
-//      lessonService.deleteLessonBook(isbn);
-//   }
 
    @RequestMapping("/listLessonTime")
    public List listLessonTime(HttpSession session, @RequestParam(required = false) String lessonDay) throws Exception{
