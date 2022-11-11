@@ -37,9 +37,7 @@
 
       var a = $(e).parent().find(".select").val();
       var lessonCode = p[a];
-
-      /* var lesson = $(this).data('value');
-      console.log */
+      
       $("#lessonbook").attr("method", "POST").attr("action",
             "/lesson/rest/addLessonBook?lessonCode=" + lessonCode).submit();
 
@@ -53,9 +51,6 @@
    function fncdeleteBook(value) {
 	   let code = $(value).attr('value');
 	   let isbn = $(value).attr('value2');
-	   /* let bookValue = new Map();
-	   bookValue.set('lessonCode',code)
-	   bookValue.set('isbn',isbn); */
 	   let bookValue = {'lessonCode':code, 'isbn':isbn};
 	   
 	   $.ajax({
@@ -67,8 +62,6 @@
 			   location.href = "/lesson/manageLessonBook";
 		   }		   
 	   })
-	  
-      /* $("#booklist").attr("method", "POST").attr("action","/lesson/deleteLessonBook="+bookValue).submit(); */
    }   
 </script>
 
@@ -100,17 +93,12 @@ img {
             <div class="form-group" style="float:right">
                    <label for="lessonCode">수 업 명</label>
                    <select class="select" aria-label="Disabled select example" style="width:180px">
-                          <!-- <option value=''> 선택</option> -->
                       <c:set var="i" value="0"/>
                       <c:forEach var="book" items="${book}">
                          <c:set var="i" value ="${i+1}"/>
                           <option class="lessonbook" value="${i}" data-value="${book.lessonCode}">${book.lessonName}</option>
                      </c:forEach>
                   </select>
-                  <!-- <div class="col-sm-10">
-                    <input type="text" class="form-control" id="lessonCode" name="lessonCode" placeholder="수업코드">
-                  </div> -->
-                    <!-- <div style="float:right"> -->
                      <input name="isbn" type="search" placeholder="isbn 입력" aria-label="Search">
                      <button class="btn btn-outline-success" type="button" ><i class="bi bi-search-heart"></i></button>
                   <!-- </div> -->
@@ -120,15 +108,12 @@ img {
       </div>
 	<br/><br/><br/>
 
-   
-   <!-- <div class="mx-5 p-5"> -->
    <div>
       <div class="row gx-5" id="book">
          <c:set var="i" value="0" />
          <c:forEach var="lesson" items="${list}">
             <c:set var="i" value="${i+1}" />
             <form id="booklist" class="booklist col-md-3" style="margin-bottom: 10px;">
-               <!-- <div class="col-md-4 mb-5 mt-3"> -->
                   <div class="card card-rased border border-top border-primary h-100">
                      <img src="${lesson.bookImg}" class="card-img-top embed-responsive-item">
                      
@@ -172,7 +157,6 @@ img {
                         </div>
                      </div>
                   </div>
-               <!-- </div> -->
             </form>
          </c:forEach>
       </div>

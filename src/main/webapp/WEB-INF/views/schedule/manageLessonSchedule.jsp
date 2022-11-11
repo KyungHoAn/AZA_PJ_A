@@ -53,49 +53,34 @@
       right: 'dayGridMonth,timeGridDay'
     },
     initialView: 'dayGridMonth',
-    locale: 'ko',   //한글설정 나머지 영어빼고 지움
-    buttonIcons: false, //이전달 다음달로 보임 <> == true
-    navLinks: true,  //날짜 누르면 상세 조회.
-    businessHours: true, //상세 시간 표시
-    editable: true,   //수정가능여부
-    selectable: true, //날짜 선택시 표시
-    dayMaxEvents: true, //이벤트가 많을 시 +표시로 보여줌 ㅎㅎ
+    locale: 'ko',   		//한글설정 나머지 영어빼고 지움
+    buttonIcons: false, 	//이전달 다음달로 보임 <> == true
+    navLinks: true, 		//날짜 누르면 상세 조회.
+    businessHours: true, 	//상세 시간 표시
+    editable: true,   		//수정가능여부
+    selectable: true, 		//날짜 선택시 표시
+    dayMaxEvents: true, 	//이벤트가 많을 시 +표시로 보여줌 ㅎㅎ
     selectMirror: true,
-    
-    events: function(info, successCallback, failureCallback){
+    events: function(info, successCallback, failureCallback) {
        // ajax 처리로 데이터를 로딩 시킨다.
-       /* var datalist = []; */
        $.ajax({
          type:"post",
          url: '/schedule/rest/listLessonSchedule',
          dataType: "json",
            success: function(list) {
-               var events = [];
-                console.log(list);                      
-                $.each(list, function (index,data){
-                   /* for(var i=0; i<data.length; i++){
-                      console.log(data[i].title);  
-                   } */
-                    var datalist = data.list;
-                   for(var i=0; i<data.length; i++){
-                      events.push({
+        	   var events = [];
+                $.each(list, function (index, data){
+                	for(var i=0; i<data.length; i++){
+                      console.log('data: '+data[i].title)
+                      console.log('start: '+data[i].start)
+                      console.log('end: '+data[i].end)
+                		events.push({
                          title:data[i].title,
                          start:data[i].start,
                          end:data[i].end
                       });
                    }
-                   /* memo-1-1*/                  
-                    
-                     /*} */
-                })                      
-                /* datalist.push({
-                    title:result.title,
-                    start:result.start,
-                    end:result.end */
-                    /* title: "오후 회의",
-                    start: "2022-06-06T19:00:00",
-                    end: "2022-06-07T09:30:00" */
-                /* }); */
+                })
                successCallback(events);
               }
        });
@@ -151,14 +136,8 @@
        eventClick: function(arg){
         if(confirm('이벤트를 지우겠습니까?')){
           arg.event.remove()
-          
-          
           var allEvent = calendar.getEvents();
-            console.log(allEvent);
-            
-            var events = new Array(); 
-            
-            /* console.log(allEvent); */
+            var events = new Array();
             for(var i=0; i< allEvent.length; i++)
             {
               var obj = new Object();

@@ -49,24 +49,10 @@ public class ScheduleRestController {
 		System.out.println(this.getClass());
 	}
 	
-	
-//	@RequestMapping(value="manageLessonSchedule", method=RequestMethod.POST)
-//	public Map<String, Object> manageLessonSchedule(HttpSession session, @RequestParam(required=false, value="teacherId") String teacherID) throws Exception{
-//		User user = (User)session.getAttribute("user");
-//		
-////		int totalCount= (int) lessonService.listLessonSchedule(search, teacherId).get("totalCount");
-////		search.setCurrentPage(1);
-////		search.setPageSize(totalCount);
-//		
-////		return lessonService.listLessonSchedule(search, teacherId);
-//		return null;
-//	}
-	
 	@RequestMapping(value="getSchedule/{scheduleCode}",method=RequestMethod.GET)
 	public Schedule getSchedule(@PathVariable int scheduleCode) throws Exception{
 		return lessonService.getLessonSchedule(scheduleCode);
 	}
-	
 
 	@RequestMapping(value="addSchedule", method=RequestMethod.POST)
 	public Schedule addSchedule(@RequestBody Schedule schedule) throws Exception{
@@ -76,16 +62,11 @@ public class ScheduleRestController {
 	
 	@RequestMapping(value="deleteSchedule/{scheduleCode}",method=RequestMethod.POST)
 	public Schedule deleteSchedule(@RequestBody Schedule schedule, @PathVariable int scheduleCode) throws Exception{
-		String teacherId = schedule.getTeacherId();
-		System.out.println("============");
-		System.out.println(teacherId);
-		System.out.println("============");
-		
+		String teacherId = schedule.getTeacherId();		
 		lessonService.deleteLessonSchedule(scheduleCode);
 		return schedule;
 	}
 	
-//	@SuppressWarnings("unchecked")
 	@RequestMapping(value= "listLessonSchedule", method=RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> listLessonSchedule(@ModelAttribute("search") Search search,
@@ -96,8 +77,6 @@ public class ScheduleRestController {
 		
 		if(role.equals("teacher")) {
 			String teacherId = ((User) session.getAttribute("user")).getUserId();
-			//추가			
-			//
 			Map<String, Object> map = lessonService.listLessonScheduleTeacher(search, teacherId);
 			
 			JSONObject json = new JSONObject();
@@ -105,19 +84,17 @@ public class ScheduleRestController {
 				for(Map.Entry<String, Object> entry : map.entrySet()) {
 					String key = entry.getKey();
 					Object value = entry.getValue();
-					
 					json.put(key, value);
 				}
 			}catch(Exception e) {
 				System.out.println("error임");
 			}
-			System.out.println(json.toString());
-//			return json;
+			System.out.println("=====");
+			System.out.println(lessonService.listLessonScheduleTeacher(search, teacherId));
+			System.out.println("=====");
 			return lessonService.listLessonScheduleTeacher(search, teacherId);
 		}else if(role.equals("student")) {
 			String studentId = ((User) session.getAttribute("user")).getUserId();
-			System.out.println("================");
-			System.out.println(teacherID);
 			Map<String, Object> map = lessonService.listLessonScheduleStudent(search, studentId);
 			
 			JSONObject json = new JSONObject();
@@ -140,9 +117,6 @@ public class ScheduleRestController {
 			search.setCurrentPage(1);
 			search.setPageSize(totalCount);
 			
-			
-			//
-			System.out.println("parent schedule !!!!!!!");
 			Map<String, Object> map = lessonService.listLessonScheduleParent(search, parentId);
 			
 			JSONObject json = new JSONObject();
@@ -160,69 +134,4 @@ public class ScheduleRestController {
 			return lessonService.listLessonScheduleParent(search, parentId);
 		}
 	}
-	
-//	@SuppressWarnings("unchecked")
-//	@RequestMapping(value="listLessonSchedule")
-//	@ResponseBody
-////	public ModelAndView listLessonSchedule(@ModelAttribute("search") Search search, HttpSession session) throws Exception{
-////	public String listLessonSchedule(@ModelAttribute("search") Search search, HttpSession session) throws Exception{
-//	public JSONObject listLessonSchedule(HttpSession session) throws Exception{
-////	public JSONArray listLessonSchedule(@ModelAttribute("search") Search search, HttpSession session) throws Exception{
-////	public Map<String,Object> listLessonSchedule(@ModelAttribute("search")Search search,
-////			@RequestParam Map<String, Object> param, HttpSession session)throws Exception{
-////	public List<Map<String,Object>> listLessonSchedule(@ModelAttribute("search")Search search,
-////			@RequestParam Map<String, Object> param, HttpSession session)throws Exception{
-////		if(search.getCurrentPage()==0)
-////		{
-////			search.setCurrentPage(1);
-////		}
-////		search.setPageSize(pageSize);
-//				
-////		param.put("time", "2022-06-06T13:00:00.000Z");
-////		param.put("end", "2022-06-06T14:00:00.000Z");
-////		param.put("title", "안녕");
-////		System.out.println(param);
-////		return param;
-//		
-//		List<Map<String,Object>> paramList = new ArrayList<Map<String,Object>>();
-//		
-//		String teacherId = ((User) session.getAttribute("user")).getUserId();
-////		Map<String, Object> map = lessonService.listLessonSchedule(search, teacherId);
-//		Map<String, Object> map = lessonService.listLessonSchedule(teacherId);
-////		String[] map = lessonService.listLessonSchedule(search, teacherId);;
-//		
-//		JSONArray arr = new JSONArray();
-//		
-//		JSONObject jsonObject = new JSONObject();
-////		for(Map.Entry<String, Object> entry: map.entrySet()) {
-////			String key = entry.getKey();
-////			Object value = entry.getValue();
-////			jsonObject.put(key, value);
-////		}
-////		arr.add(jsonObject);
-////		jsonObject.put("id", "1");
-////		jsonObject.put("title", "안녕");
-////		jsonObject.put("time", "2022-06-06T13:00:00.000Z");
-////		jsonObject.put("end", "2022-06-06T14:00:00.000Z");
-////		System.out.println(jsonObject);
-////		return jsonObject;
-////		System.out.println(arr);
-////		return arr;
-//		
-////		JSONParser parser = new JSONParser();
-//		
-//		JSONObject json = new JSONObject();
-//		try {
-//			for(Map.Entry<String, Object> entry : map.entrySet()) {
-//				String key = entry.getKey();
-//				Object value = entry.getValue();
-//				
-//				json.put(key, value);
-//			}
-//		}catch(Exception e) {
-//			System.out.println("error임");
-//		}
-//		System.out.println(json.toString());
-//		return json;
-//	}
 }
