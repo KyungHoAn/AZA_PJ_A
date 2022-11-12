@@ -31,8 +31,6 @@ public class LessonServiceImpl implements LessonService {
 	
 	public LessonServiceImpl() {
 		// TODO Auto-generated constructor stub
-		System.out.println("====lessonServiceImpl=====");
-		System.out.println(this.getClass());
 	}
 
 	@Override
@@ -50,10 +48,6 @@ public class LessonServiceImpl implements LessonService {
 	@Override
 	public void updateLesson(Lesson lesson) throws Exception {
 		// TODO Auto-generated method stub
-
-		System.out.println("updateLesson DB Á¢¼Ó");
-
-		System.out.println(lesson);
 		lessonDao.updateLesson(lesson);
 	}
 

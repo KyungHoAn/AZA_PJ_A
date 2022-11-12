@@ -117,48 +117,6 @@ public class ScheduleController {
 		}
 	}
 	
-	@RequestMapping(value="addLessonSchedule", method=RequestMethod.POST)
-	public ModelAndView addLessonSchedule(@ModelAttribute("search") Search search, HttpSession session, HttpServletRequest req) throws Exception{
-		ModelAndView model = new ModelAndView();
-		
-		Schedule schedule = new Schedule();
-		
-		JSONObject json = new JSONObject();
-		
-		JSONParser parser = new JSONParser();
-		
-		String userId = ((User) session.getAttribute("user")).getUserId();
-		System.out.println(userId);
-		
-		String[] alldata = req.getParameterValues("alldata");
-		
-		lessonService.deteteLessonScheduleAll(userId);
-		for(int i=0; i<alldata.length; i++) {
-//			Object obj = parser.parse(req.getParameterValues("alldata")[0]);
-			Object obj = parser.parse(alldata[i]);
-//			System.out.println(obj);
-			JSONArray jsonA = (JSONArray) obj;
-//			System.out.println(jsonA);
-			
-			for(int j=0; j<jsonA.size(); j++) {
-				json = (JSONObject) jsonA.get(j);
-				System.out.println(json);
-				System.out.println("==============");
-				String scheduleTitle = (String) json.get("title");
-				String scheduleStartTime = (String) json.get("start");
-				String scheduleEndTime = (String) json.get("end");
-				
-				schedule.setTeacherId(userId);
-				schedule.setTitle(scheduleTitle);
-				schedule.setStart(scheduleStartTime);
-				schedule.setEnd(scheduleEndTime);
-				lessonService.addLessonSchedule(schedule);
-			}
-		}
-		model.setViewName("redirect:/schedule/manageLessonSchedule");
-		return model;
-	}
-	
 	@RequestMapping(value="getLessonSchedule")
 	public ModelAndView getLessonSchedule(@RequestParam("scheduleCode") int scheduleCode) throws Exception{
 		ModelAndView model  = new ModelAndView();

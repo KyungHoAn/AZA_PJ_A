@@ -20,9 +20,6 @@
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-
-
-
 <!-- getLesson.jsp -->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -31,10 +28,6 @@
 <!-- Roboto and Roboto Mono fonts from Google Fonts-->
 <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet" />
 <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,500" rel="stylesheet" />
-
-
-<!-- 
-<link href="/resources/css/styles.css" rel="stylesheet"> -->
 <link href="/resources/css/common.css" rel="stylesheet">
 <script>
   var calendar = null;
@@ -67,9 +60,6 @@
         	   var events = [];
                 $.each(list, function (index, data){
                 	for(var i=0; i<data.length; i++){
-                      console.log('data: '+data[i].title)
-                      console.log('start: '+data[i].start)
-                      console.log('end: '+data[i].end)
                 		events.push({
                          title:data[i].title,
                          start:data[i].start,
@@ -106,8 +96,6 @@
                "start":start_date,
                "end":end_date
             }//전송할 객체 생성
-            
-            console.log(obj); //서버로 해당 객체를 전달해서 DB연동 가능
             calendar.addEvent({
                title: obj.title,
                start: obj.start,
@@ -117,41 +105,30 @@
             })
             }
          });
-     /* var title = prompt('일정 등록: ');  //title값이 있을때, 화면에 calendar.addEvent() json형식으로 일정을 추가
-         if(title){
-           calendar.addEvent({
-            title: title,
-             start: arg.start,
-             end: arg.end,  // allDay: arg.allDay,
-             backgroundColor:"skyblue",
-             textColor:"blue"
-           })
-         } */
         calendar.unselect()
        },
        eventClick: function(arg){
         if(confirm('이벤트를 지우겠습니까?')){
-          arg.event.remove()
-          var allEvent = calendar.getEvents();
-            var events = new Array();
-            for(var i=0; i< allEvent.length; i++)
-            {
-              var obj = new Object();
-               /* alert(allEvent[i]._def.title);//이벤트 명칭 */
-              obj.title = allEvent[i]._def.title;   //이벤트 명칭
-              /* obj.allday = allEvent[i]._def.allDay; //하루종일의 이벤트인지 알려주는 boolean */
-              obj.start = allEvent[i]._instance.range.start; //시작 날짜 및 시간
-              obj.end = allEvent[i]._instance.range.end;
-              
-              events.push(obj);
+            arg.event.remove()
+            var allEvent = calendar.getEvents();
+            let title = allEvent[0]._def.title;
+            let start = allEvent[0]._instance.range.start;
+            let end = allEvent[0]._instance.range.end;
+            let scheduleData = {"title": title, "start": start, "end": end};
+            $.ajax
+            ({
+               type:'POST',
+               url: '/schedule/rest/deleteSchedule',
+               data: scheduleData,
+               success: function(data) {
+               	alert('삭제완료')	
+               },
+               error:function(e) {
+             	  alert('error: ', e)
+               }  
+             });
             }
-            var jsondata = JSON.stringify(events);
-            /* console.log(jsondata); */
-            savedata(jsondata)
-            
-        }
-      },
-      
+        },      
       aditable: true,   //false로 변경시 draggable 작동 x
       displayEventTime: false // 시간 표시 x modal 표시로 작성한 부분
     
@@ -167,57 +144,37 @@
       
       function allSave()
       {
-         var allEvent = calendar.getEvents();
-         console.log(allEvent);
+         var allEvent = calendar.getEvents();         
+         var events = new Array();
          
-         var events = new Array(); 
-         
-         /* console.log(allEvent); */
          for(var i=0; i< allEvent.length; i++)
          {
            var obj = new Object();
-            /* alert(allEvent[i]._def.title);//이벤트 명칭 */
            obj.title = allEvent[i]._def.title;   //이벤트 명칭
-           /* obj.allday = allEvent[i]._def.allDay; //하루종일의 이벤트인지 알려주는 boolean */
            obj.start = allEvent[i]._instance.range.start; //시작 날짜 및 시간
            obj.end = allEvent[i]._instance.range.end;
            
            events.push(obj);
          }
-         console.log(events)
          var jsondata = JSON.stringify(events);
-         /* console.log(jsondata); */
-        alert("저장되었습니다.")
-         savedata(jsondata)
-      }
-      
-      function savedata(jsondata)
-      {
-         $.ajax
-         ({
-            type:'POST',
-            url: '/schedule/addLessonSchedule',
-            data: {"alldata": jsondata},
-            /* data: {"scheduleTitle":jsondata.scheduleTitle,
-               "scheduleStartTime":"scheduleStartTime",
-               "scheduleEndTime":"scheduleEndTime"}, */
-            dataType: 'text',
-            async: false //==>동기
-            /* success: function(data){
-               alert("OK");
-            } */
-          })
-          .done(function(result){
-             /* Swal.fire(
-                   '저장!',
-                   '일정이 정상적으로 삭제되었습니다!',
-                   'success'
-                 ) */
-          })
-          
-          .fail(function(request, status, error){
-             alert("error");
-          });
+         
+        $.ajax
+        ({
+           type:'POST',
+           url: '/schedule/rest/addLessonSchedule',
+           data: {"alldata": jsondata},
+           /* data: {"scheduleTitle":jsondata.scheduleTitle,
+              "scheduleStartTime":"scheduleStartTime",
+              "scheduleEndTime":"scheduleEndTime"}, */
+           dataType: 'text',
+           async: false, //==>동기
+           success: function(data) {
+           	alert('일정 등록완료')	
+           },
+           error:function(e) {
+         	  alert('error: ', e)
+           }  
+         });
       }
       
       function fncSelectTeacher(e){
@@ -226,62 +183,12 @@
          const select = $(".schedule");
          for(let i=0; i<select.length; i++){
             p.push($(select[i]).data('value'))
-         }
-         console.log(p)
-         
+         }         
          var a = $(e).parent().find(".form-select").val();
-         console.log(a)
          var teacherId = p[a];
-         console.log(teacherId)
             
          $("#selectTeacher").attr("method","POST").attr("action","/schedule/manageLessonSchedule?teacherID="+teacherId).submit();
       }
-      
-/*      $(function(){
-         $("button.btn01").on("click",function(){
-            fncSelectTeacher(this);
-         });
-      }); */
-      
-/*       $(function(){
-         $("#success").on("click",function(){
-            Swal.fire({
-               title: 'Custom width, padding, color, background.',
-                       width: 600,
-                       padding: '3em',
-                       color: '#716add',
-                       background: '#fff url(https://sweetalert2.github.io/images/trees.png)',
-                       backdrop: `
-                         rgba(0,0,123,0.4)
-                         url("https://sweetalert2.github.io/images/nyan-cat.gif")
-                         left top
-                         no-repeat`
-                     })
-         });
-      }); */
-      
-      
-      /* $(document).on('click', '#success', function(e) {
-          swal(
-            'Success',
-            'You clicked the <b style="color:green;">Success</b> button!',
-            'success'
-          ) */
-        
-/*       $(document).on('click', '#success', function(e) {
-      Swal.fire({
-        title: 'Custom width, padding, color, background.',
-                width: 600,
-                padding: '3em',
-                color: '#716add',
-                background: '#fff url(https://sweetalert2.github.io/images/trees.png)',
-                backdrop: `
-                  rgba(0,0,123,0.4)
-                  url("https://sweetalert2.github.io/images/nyan-cat.gif")
-                  left top
-                  no-repeat`
-              })
-      }); */
     </script>
 
 <style>
@@ -290,9 +197,7 @@ body {
    padding: 0;
    font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
    font-size: 14px;
-   background-color: #f5f5f5;
-   
-     
+   background-color: #f5f5f5; 
 }
 
 .success{
@@ -328,14 +233,6 @@ font-family: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
 </head>
 <body class="mt-0">
    <div id='loading'>loading...</div>
-<%--    <div style="height:30px; text-align:center; font-size:35px; color:black; margin-bottom:30px; font-weight:bold">
-   <div style="width:60%; float:left; text-align:right">일정 현황
-   </div><div style="width:40%; float:left;text-align:right"></div>
-   <c:if test="${user.role eq 'teacher' }">
-   <button style="width:120px; height:40px; background-color:black; color:white; vertical-align:middle; font-size:17px;
-   cursor:poointer" onclick="javascript:allSave();">전체저장</button>
-   </c:if>
-   </div> --%>
    <c:if test="${user.role eq 'student' }">
       <form id = "selectTeacher" class="d-flex"   > 
       <div class="form-group">
