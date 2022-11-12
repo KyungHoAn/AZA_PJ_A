@@ -37,10 +37,6 @@
 <link href="/resources/css/styles.css" rel="stylesheet"> -->
 <link href="/resources/css/common.css" rel="stylesheet">
 <script>
-//addEventListener => 특정요소(id, class,tag등등)event를 클릭하면 함수를 실행해
-/* document.addEventListener('DOMContentLoaded', function() { */
-  
-//new FullCalendar.Calendar(대상 DOM 객체,(속성: 속성값, 속성2: 속성값2..))
   var calendar = null;
   
   $(document).ready(function(){
@@ -194,10 +190,6 @@
         alert("저장되었습니다.")
          savedata(jsondata)
       }
-      
-      
-      
-/*memo-1-2*/
       
       function savedata(jsondata)
       {
