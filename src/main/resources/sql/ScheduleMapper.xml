@@ -21,7 +21,6 @@
 		<association property="teacherName" javaType="user">
 			<id property="userName" column="user_name" jdbcType="VARCHAR"/>
 		</association>
-		
 	</resultMap>
 	
 	<insert id = "addLessonSchedule">
@@ -31,14 +30,12 @@
 		#{scheduleStartDate:VARCHAR},#{start:VARCHAR},
 		#{scheduleEndDate:VARCHAR},#{end:VARCHAR},#{scheduleContent:VARCHAR},#{title})
 	</insert>
-	<!-- (SELECT user_id FROM USERS WHERE user_id = #{teacherId}) -->
 	
 	<select id = "getLessonSchedule" parameterType = "int" resultMap = "scheduleSelectMap">		
 		SELECT S.schedule_start_date, S.schedule_end_date, S.start, S.end, S.schedule_content,S.title
 		FROM schedule S, users U
 		WHERE S.teacher_id = u.user_id AND S.schedule_code = #{scheduleCode}
 	</select>
-	
 	
 	<update id = "updateLessonSchedule">
 		UPDATE schedule
@@ -50,30 +47,13 @@
 			schedule_content = #{scheduleContent:VARCHAR},
 			title = #{scheduleTitlte:VARCHAR}
 		</set>
-		WHERE schedule_code = #{scheduleCode} AND teacher_id = #{teacherId} <!-- #{teacherId} -->
+		WHERE schedule_code = #{scheduleCode} AND teacher_id = #{teacherId}
 	</update>
-	
-
-	<delete id = "deleteLessonSchedule">
-		DELETE 
-		FROM schedule
-		WHERE schedule_code = #{scheduleCode}
-	</delete>
 	
 	<delete id ="deleteAll">
 		DELETE FROM schedule where teacher_id = #{teacherId}
 	</delete>
 	
-<!-- 	<select id ="listLessonSchedule" resultMap="scheduleSelectMap">
-			SELECT *
-			FROM ( SELECT inner_table.*, ROWNUM AS row_seq
-				FROM ( SELECT *	FROM schedule 
-					WHERE teacher_id = #{teacherId}
-					ORDER BY schedule_start_date || schedule_start_time
-					Order by schedule_code DESC) inner_table
-				WHERE ROWNUM &lt;= #{endRowNum} )
-			WHERE row_seq BETWEEN #{startRowNum} AND #{endRowNum}
-	</select> -->
 	<select id = "listLessonScheduleTeacher" resultMap="scheduleSelectMap">
 		select s.* from schedule s
 		where s.teacher_id = #{searchId}
@@ -85,28 +65,8 @@
 		FROM schedule S, users U, (SELECT L.teacher_id LT
 		        FROM students_record SR, lesson L
 		        WHERE SR.lesson_code = L.lesson_code AND SR.student_id = #{searchId} AND ROWNUM &lt; 2) A
-		WHERE S.teacher_id = U.user_id AND U.user_id = A.LT  <!-- AND S.teacher_Id = #{teacherId} -->
-		        <!-- <if test="searchCondition != null">
-						<if test="searchCondition == 0 and searchKeyword !='' ">
-							
-						</if>
-				</if> -->
+		WHERE S.teacher_id = U.user_id AND U.user_id = A.LT
 	</select>
-	
-<!-- 	<select id = "listLessonScheduleParent" resultMap="scheduleSelectMap">
-		select S.*
-		FROM SCHEDULE S, (select L.teacher_id teacher_id, SR.student_id
-		        FROM LESSON L, STUDENTS_RECORD SR, (select R.student_id RSI
-		                FROM relation R, users U
-		                where U.user_id = R.parent_id and U.user_id = #{searchId}) A
-		        WHERE L.lesson_code = SR.lesson_code AND SR.student_id = A.RSI) B
-		WHERE S.teacher_id = B.teacher_id 
-		<if test="searchCondition != null">
-					<if test="searchCondition == 5 and searchKeyword !='' ">
-	 					AND S.teacher_id like '%${searchKeyword}%'
-	 				</if>
-	 	</if>
-	</select> -->
 	
 	<!-- choice -->
 	<select id = "listLessonScheduleParent" resultMap="scheduleSelectMap">
@@ -123,6 +83,7 @@
 			        </if>	) B		        
 			WHERE S.teacher_id = B.teacher_id
 	</select>
+	
 	<select id = "getlistLessonScheduleParentTotalCount" resultType="int">
 		SELECT COUNT(*)
 		FROM(select S.*, B.student_name, B.student_id
@@ -138,25 +99,7 @@
 			        </if>		) B	        
 			WHERE S.teacher_id = B.teacher_id
 		)countTable
-	</select>	
-	
-	<!-- parent choice -->
-	<!-- <select id = "getlistLessonScheduleParentTotalCount" resultType="int">
-		SELECT COUNT(*)
-		FROM(select S.*
-			FROM SCHEDULE S, (select L.teacher_id teacher_id, SR.student_id
-			        FROM LESSON L, STUDENTS_RECORD SR, (select R.student_id RSI
-			                FROM relation R, users U
-			                where U.user_id = R.parent_id and U.user_id = #{searchId}) A
-			        WHERE L.lesson_code = SR.lesson_code AND SR.student_id = A.RSI) B
-			WHERE S.teacher_id = B.teacher_id 
-			<if test="searchCondition != null">
-					<if test="searchCondition == 5 and searchKeyword !='' ">
-	 					AND S.teacher_id like '%${searchKeyword}%'
-	 				</if>
-	 		</if>
-		)countTable
-	</select> -->
+	</select>
 	
 	<select id = "listLessonSelectTeacher" resultMap="scheduleSelectMap">
 		SELECT DISTINCT U.user_name,L.teacher_id
@@ -171,8 +114,6 @@
 				WHERE U.user_id = L.teacher_id AND SR.lesson_code = L.lesson_code AND SR.student_id = #{searchKeyword}
 		)countTable
 	</select>
-	
-	
 	
 	<select id = "getLessonScheduleTeacherTotalCount" resultType="int">
 		SELECT COUNT(*)
@@ -190,6 +131,12 @@
 		        ) countTable
 	</select>
 	
-	
+	<delete id="deleteSchedule" parameterType="map">
+		DELETE FROM schedule
+		WHERE teacher_id=#{teacher_id} 
+		AND schedule_title = #{title} 
+		AND schedule_start_time = #{start}
+		AND sceedule_end_time = #{end}
+	</delete>
 	
 </mapper>

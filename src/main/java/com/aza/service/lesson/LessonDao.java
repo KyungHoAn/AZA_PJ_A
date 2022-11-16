@@ -80,7 +80,7 @@ public interface LessonDao {
 	public void updateLessonSchedule(Schedule schedule) throws Exception;
 	
 	//schedule : delete
-	public void deleteLessonSchedule(int scheudleCode) throws Exception;
+//	public void deleteLessonSchedule(int scheudleCode) throws Exception;
 	
 	//schedule : listTeacher
 	public List<Schedule> listLessonScheduleTeacher(Search search, String teacherId) throws Exception;

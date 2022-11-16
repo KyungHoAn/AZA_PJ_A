@@ -66,7 +66,7 @@ public interface LessonService {
 	public void updateLessonSchedule(Schedule schedule) throws Exception;
 
 	// schedule : delete
-	public void deleteLessonSchedule(int scheudleCode) throws Exception;
+	public void deleteLessonSchedule(Map<String, Object> map) throws Exception;
 
 	// schedule : list teacher
 	public Map<String, Object> listLessonScheduleTeacher(Search search, String teacherId) throws Exception;

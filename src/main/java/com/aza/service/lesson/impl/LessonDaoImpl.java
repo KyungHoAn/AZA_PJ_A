@@ -251,13 +251,13 @@ public class LessonDaoImpl implements LessonDao {
 		sqlSessionTemplate.update("ScheduleMapper.updateLessonSchedule", schedule);
 	}
 
-	@Override
-	public void deleteLessonSchedule(int scheduleCode) throws Exception {
-		// TODO Auto-generated method stub
-		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("scheduleCode", scheduleCode);
-		sqlSessionTemplate.delete("ScheduleMapper.deleteLessonSchedule",map);
-	}
+//	@Override
+//	public void deleteLessonSchedule(int scheduleCode) throws Exception {
+//		// TODO Auto-generated method stub
+//		Map<String, Object> map = new HashMap<String, Object>();
+//		map.put("scheduleCode", scheduleCode);
+//		sqlSessionTemplate.delete("ScheduleMapper.deleteLessonSchedule",map);
+//	}
 
 	@Override
 	public List<Schedule> listLessonScheduleTeacher(Search search, String teacherId) throws Exception {

@@ -107,9 +107,8 @@ public class ScheduleRestController {
 	@PostMapping(value = "deleteSchedule")
 	@ResponseBody
 	public void deleteSchedule(@RequestParam Map<String, Object> map, HttpServletRequest req, HttpServletResponse res) throws Exception {
-		System.out.println("deleteSchedule");
 		try {
-			System.out.println("map: "+map);
+			lessonService.deleteLessonSchedule(map);
 			map.put("success", true);
 		} catch(Exception e) {
 			map.put("success", false);

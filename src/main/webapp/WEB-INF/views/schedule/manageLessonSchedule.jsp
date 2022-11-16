@@ -111,6 +111,7 @@
         if(confirm('이벤트를 지우겠습니까?')){
             arg.event.remove()
             var allEvent = calendar.getEvents();
+            console.log(allEvent[0])
             let title = allEvent[0]._def.title;
             let start = allEvent[0]._instance.range.start;
             let end = allEvent[0]._instance.range.end;

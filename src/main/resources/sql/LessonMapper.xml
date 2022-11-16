@@ -53,15 +53,6 @@
 			<result property="lessonCode" column="lesson_code" jdbcType="VARCHAR"/>
 		</association>
 	</resultMap>	
-
-	<!-- LESSON :: INSERT -->
-<!-- - 	<insert id="addLesson">
-		INSERT 
-		INTO LESSON		
-		VALUES (#{lessonCode}, #{teacherId}, #{lessonName}, #{lessonDay},#{lessonStartTime},
-		 #{lessonEndTime}, #{lessonPlace}, #{fees}, #{subject}, #{lessonContent:VARCHAR}, 
-		TO_CHAR(sysdate, 'yyyy/mm/dd HH24:MI:SS'))
-	</insert> -->	
 	
 	<insert id="addLesson">
 		INSERT 
