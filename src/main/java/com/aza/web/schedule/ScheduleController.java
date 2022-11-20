@@ -71,12 +71,7 @@ public class ScheduleController {
 		}
 		search.setPageSize(pageSize);;
 		String userRole = ((User)session.getAttribute("user")).getRole();
-//		
-//		ModelAndView model = new ModelAndView();
-//		model.setViewName("/schedule/manageLessonSchedule");
-//		return model;
 		
-		//CHOICE 생성 2022/06/25		
 		if(userRole.equals("teacher")) {
 			ModelAndView model = new ModelAndView();
 			model.setViewName("/schedule/manageLessonSchedule");
@@ -84,9 +79,6 @@ public class ScheduleController {
 		} else if(userRole.equals("student")) {	
 			String studentId = ((User)session.getAttribute("user")).getUserId();
 			Map<String, Object> map = lessonService.listLessonSelectTeacher(search, studentId);
-			System.out.println("===============");
-			System.out.println(map);
-			System.out.println("===============");
 			Page resultPage = new Page(search.getCurrentPage(),((Integer)map.get("totalCount")).intValue(),pageUnit,pageSize);
 			
 			ModelAndView model = new ModelAndView();
@@ -98,14 +90,7 @@ public class ScheduleController {
 			return model;
 		} else {
 			String parentId = ((User)session.getAttribute("user")).getUserId();
-			System.out.println("=-====-=-");
-			System.out.println(parentId);
-			System.out.println("=-====-=-");
-//			Map<String, Object> map = lessonService.listLessonScheduleParent(search, parentId);
 			Map<String, Object> map = userservice.listStudentRelationByParent(search, parentId);
-			System.out.println("==============");
-			System.out.println(map);
-			System.out.println("==============");
 			Page resultPage = new Page(search.getCurrentPage(),((Integer)map.get("totalCount")).intValue(),pageUnit,pageSize);
 			ModelAndView model = new ModelAndView();
 			
