@@ -48,7 +48,7 @@
     businessHours: true, 	//상세 시간 표시
     editable: true,   		//수정가능여부
     selectable: true, 		//날짜 선택시 표시
-    dayMaxEvents: true, 	//이벤트가 많을 시 +표시로 보여줌 ㅎㅎ
+    dayMaxEvents: true, 	//이벤트가 많을 시 +표시로 보여줌
     selectMirror: true,
     events: function(info, successCallback, failureCallback) {
        // ajax 처리로 데이터를 로딩 시킨다.
