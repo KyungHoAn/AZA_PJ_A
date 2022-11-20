@@ -75,16 +75,10 @@ public class ScheduleRestController {
 		try {
 			for(int i=0; i<alldata.length; i++) {
 				Object obj = parser.parse(alldata[i]);
-				System.out.println("======");
-				System.out.println(obj);
 				JSONArray jsonA = (JSONArray) obj;
-				System.out.println(jsonA);
-				System.out.println("======");
 				
 				for(int j=0; j<jsonA.size(); j++) {
 					json = (JSONObject) jsonA.get(j);
-					System.out.println(json);
-					System.out.println("==============");
 					String scheduleTitle = (String) json.get("title");
 					String scheduleStartTime = (String) json.get("start");
 					String scheduleEndTime = (String) json.get("end");

@@ -215,6 +215,9 @@ public class LessonServiceImpl implements LessonService {
 		//end=Thu Nov 24 2022 00:55:00 GMT+0900 ()}
 		
 		//lessonDao.deleteLessonSchedule(scheduleCode);
+		
+		// next ->  mapper에 값 전송하기
+//		lessonDao.delete
 	}
 
 	@Override
