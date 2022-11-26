@@ -213,11 +213,10 @@ public class LessonServiceImpl implements LessonService {
 		//start=Wed Nov 23 2022 23:55:00 GMT+0900 (), 
 		// 2022-11-23T05:55:00.000Z
 		//end=Thu Nov 24 2022 00:55:00 GMT+0900 ()}
-		
 		//lessonDao.deleteLessonSchedule(scheduleCode);
 		
 		// next ->  mapper에 값 전송하기
-//		lessonDao.delete
+		//lessonDao.delete
 	}
 
 	@Override
