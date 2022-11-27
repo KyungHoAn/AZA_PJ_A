@@ -58,43 +58,24 @@ public class ScheduleRestController {
 	
 	@RequestMapping(value="addLessonSchedule", method=RequestMethod.POST)
 	public Map<String, Object> addLessonSchedule(@ModelAttribute("search") Search search, Map<String,Object> result, HttpSession session, HttpServletRequest req) throws Exception{
-		ModelAndView model = new ModelAndView();
-		
 		Schedule schedule = new Schedule();
-		
-		JSONObject json = new JSONObject();
-		
-		JSONParser parser = new JSONParser();
-		
 		String userId = ((User) session.getAttribute("user")).getUserId();
-		
-		String[] alldata = req.getParameterValues("alldata");
-		
-		lessonService.deteteLessonScheduleAll(userId);
+		String scheduleContent = req.getParameter("content");
+		String startTime = req.getParameter("startTime");
+		String endTime = req.getParameter("endTime");
+		String defId = req.getParameter("defId");
 		
 		try {
-			for(int i=0; i<alldata.length; i++) {
-				Object obj = parser.parse(alldata[i]);
-				JSONArray jsonA = (JSONArray) obj;
-				
-				for(int j=0; j<jsonA.size(); j++) {
-					json = (JSONObject) jsonA.get(j);
-					String scheduleTitle = (String) json.get("title");
-					String scheduleStartTime = (String) json.get("start");
-					String scheduleEndTime = (String) json.get("end");
-					
-					schedule.setTeacherId(userId);
-					schedule.setTitle(scheduleTitle);
-					schedule.setStart(scheduleStartTime);
-					schedule.setEnd(scheduleEndTime);
-					lessonService.addLessonSchedule(schedule);
-				}
-			}
+			schedule.setTeacherId(userId);
+			schedule.setTitle(scheduleContent);
+			schedule.setStart(startTime);
+			schedule.setEnd(endTime);
+			schedule.setScheduleStartDate(defId);
+			lessonService.addLessonSchedule(schedule);
 			result.put("success", true);
 		} catch(Exception e) {
 			result.put("success", false);
 		}
-//		model.setViewName("redirect:/schedule/manageLessonSchedule");
 		return result;
 	}
 	
@@ -132,7 +113,7 @@ public class ScheduleRestController {
 					json.put(key, value);
 				}
 			}catch(Exception e) {
-				System.out.println("error임");
+				System.out.println("error");
 			}
 			return lessonService.listLessonScheduleTeacher(search, teacherId);
 			
@@ -149,7 +130,7 @@ public class ScheduleRestController {
 					json.put(key, value);
 				}
 			}catch(Exception e) {
-				System.out.println("error임");
+				System.out.println("error");
 			}
 			return lessonService.listLessonScheduleStudent(search, studentId);
 		} else {

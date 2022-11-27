@@ -124,45 +124,219 @@
 						//defId 저장 가능
 						// 2022-11-20T00:25
 						// Sun Nov 20 2022 09:25:00 GMT+0900 (한국 표준시)
-						let startTime = allEvent[i]._instance.range.start
-						let st = startTime.substr(11, 15)
-						console.log(st)
-						if(allEvent[i]._def.title == content) {	// 저장 하는 title
-							
+						let startTime = allEvent[i]._instance.range.start.toString()
+						let sMonth = startTime.substr(3,4)	// month
+						let yearT = startTime.substr(10,11)
+						let [startTime1, startYear] = yearT.split(' ')		//year
+						let dayY = startTime.substr(7,8)
+						let [startYear2, startDay] = dayY.split(' ')		// day
+						/* console.log('----')
+						console.log(startDay)		//??? +1 error
+						console.log('----') */
+						
+						let endTime = allEvent[i]._instance.range.end.toString()
+						let eMonth = endTime.substr(3,4)		//month
+						let endT = endTime.substr(10,11)
+						let [endTime1, endYear] = endT.split(' ')	// endYear
+						let dayY2 = endTime.substr(7,8)
+						let [endYear2, endDay] = dayY2.split(' ')		//endDay
+						
+						let inputStartDate = start_date.substr(0,10)	// year-month-day
+						let inputEndDate = end_date.substr(0,10)		// year-month-day
+						
+						// month 치환 Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec
+						let startMonth;
+						if(sMonth == ' Jan'){
+							startMonth = '01';
+						}else if(sMonth == ' Feb'){
+							startMonth = '02';
+						}else if(sMonth == ' Mar'){
+							startMonth = '03';
+						}else if(sMonth == ' Apr'){
+							startMonth = '04';
+						}else if(sMonth == ' May'){
+							startMonth = '05';
+						}else if(sMonth == ' Jun'){
+							startMonth = '06';
+						}else if(sMonth == ' Jul'){
+							startMonth = '07';
+						}else if(sMonth == ' Aug'){
+							startMonth = '08';
+						}else if(sMonth == ' Sep'){
+							startMonth = '09';
+						}else if(sMonth == ' Oct'){
+							startMonth = '10';
+						}else if(sMonth == ' Nov'){
+							startMonth = '11';
+						}else if(sMonth == ' Dec'){
+							startMonth = '12';
+						}
+						
+						let endMonth;
+						if(sMonth == ' Jan'){
+							endMonth = '01';
+						}else if(sMonth == ' Feb'){
+							endMonth = '02';
+						}else if(sMonth == ' Mar'){
+							endMonth = '03';
+						}else if(sMonth == ' Apr'){
+							endMonth = '04';
+						}else if(sMonth == ' May'){
+							endMonth = '05';
+						}else if(sMonth == ' Jun'){
+							endMonth = '06';
+						}else if(sMonth == ' Jul'){
+							endMonth = '07';
+						}else if(sMonth == ' Aug'){
+							endMonth = '08';
+						}else if(sMonth == ' Sep'){
+							endMonth = '09';
+						}else if(sMonth == ' Oct'){
+							endMonth = '10';
+						}else if(sMonth == ' Nov'){
+							endMonth = '11';
+						}else if(sMonth == ' Dec'){
+							endMonth = '12';
+						}
+						
+						let selectStartDate = startYear+'-'+startMonth+'-'+(startDay-1)
+						/* console.log(inputStartDate==selectStartDate) ok*/
+						
+						let selectEndDate = endYear+'-'+endMonth+'-'+(endDay-1)
+						/* console.log(inputEndDate == selectEndDate) ok */
+						
+						let defId = allEvent[i]._def.defId
+						if(allEvent[i]._def.title == content && inputStartDate==selectStartDate && inputEndDate == selectEndDate) {
+							$.ajax({
+								type : 'POST',
+								url : '/schedule/rest/addLessonSchedule',
+								data : {
+									"defId" : defId,
+									"startTime" : start_date,
+									"endTime" : end_date,
+									"content" : content
+								},
+								success : function(data) {
+									alert('일정 등록완료')
+								},
+								error : function(e) {
+									alert('error: ', e)
+								}
+							});
 						}
 					}
-					/* $.ajax({
-						type : 'POST',
-						url : '/schedule/rest/addLessonSchedule',
-						data : {
-							"alldata" : jsondata
-						},
-						dataType : 'text',
-						async : false, //==>동기
-						success : function(data) {
-							alert('일정 등록완료')
-						},
-						error : function(e) {
-							alert('error: ', e)
-						}
-					}); */
-					
 				});
 				calendar.unselect()
 			},
 			eventClick : function(arg) {
 				if (confirm('이벤트를 지우겠습니까?')) {
 					arg.event.remove()
+					console.log(JSON.stringify(arg, null, "\t"))
+					console.log('-----')
+					/* console.log(Object.values(arg)); */
+					let obj = Object.values(arg)
+					console.log(obj[1]._def.title)
+					console.log(obj[1]._instance.range.start)
+					console.log(obj[1]._instance.range.end)
 					var allEvent = calendar.getEvents();
-					let title = allEvent[0]._def.title;
+					/* let title = allEvent[0]._def.title;
 					let start = allEvent[0]._instance.range.start;
-					let end = allEvent[0]._instance.range.end;
-					let scheduleData = {
+					let end = allEvent[0]._instance.range.end; */	
+					
+					
+					
+					// 밑에 delete 수정 ing..
+					
+					let startTime = allEvent[i]._instance.range.start.toString()
+					let sMonth = startTime.substr(3,4)	// month
+					let yearT = startTime.substr(10,11)
+					let [startTime1, startYear] = yearT.split(' ')		//year
+					let dayY = startTime.substr(7,8)
+					let [startYear2, startDay] = dayY.split(' ')		// day
+					/* console.log('----')
+					console.log(startDay)		//??? +1 error
+					console.log('----') */
+					
+					let endTime = allEvent[i]._instance.range.end.toString()
+					let eMonth = endTime.substr(3,4)		//month
+					let endT = endTime.substr(10,11)
+					let [endTime1, endYear] = endT.split(' ')	// endYear
+					let dayY2 = endTime.substr(7,8)
+					let [endYear2, endDay] = dayY2.split(' ')		//endDay
+					
+					let inputStartDate = start_date.substr(0,10)	// year-month-day
+					let inputEndDate = end_date.substr(0,10)		// year-month-day
+					
+					// month 치환 Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec
+					let startMonth;
+					if(sMonth == ' Jan'){
+						startMonth = '01';
+					}else if(sMonth == ' Feb'){
+						startMonth = '02';
+					}else if(sMonth == ' Mar'){
+						startMonth = '03';
+					}else if(sMonth == ' Apr'){
+						startMonth = '04';
+					}else if(sMonth == ' May'){
+						startMonth = '05';
+					}else if(sMonth == ' Jun'){
+						startMonth = '06';
+					}else if(sMonth == ' Jul'){
+						startMonth = '07';
+					}else if(sMonth == ' Aug'){
+						startMonth = '08';
+					}else if(sMonth == ' Sep'){
+						startMonth = '09';
+					}else if(sMonth == ' Oct'){
+						startMonth = '10';
+					}else if(sMonth == ' Nov'){
+						startMonth = '11';
+					}else if(sMonth == ' Dec'){
+						startMonth = '12';
+					}
+					
+					let endMonth;
+					if(sMonth == ' Jan'){
+						endMonth = '01';
+					}else if(sMonth == ' Feb'){
+						endMonth = '02';
+					}else if(sMonth == ' Mar'){
+						endMonth = '03';
+					}else if(sMonth == ' Apr'){
+						endMonth = '04';
+					}else if(sMonth == ' May'){
+						endMonth = '05';
+					}else if(sMonth == ' Jun'){
+						endMonth = '06';
+					}else if(sMonth == ' Jul'){
+						endMonth = '07';
+					}else if(sMonth == ' Aug'){
+						endMonth = '08';
+					}else if(sMonth == ' Sep'){
+						endMonth = '09';
+					}else if(sMonth == ' Oct'){
+						endMonth = '10';
+					}else if(sMonth == ' Nov'){
+						endMonth = '11';
+					}else if(sMonth == ' Dec'){
+						endMonth = '12';
+					}
+					
+					let selectStartDate = startYear+'-'+startMonth+'-'+(startDay-1)
+					/* console.log(inputStartDate==selectStartDate) ok*/
+					
+					let selectEndDate = endYear+'-'+endMonth+'-'+(endDay-1)
+					/* console.log(inputEndDate == selectEndDate) ok */
+					
+					
+					
+					
+					/* let scheduleData = {
 						"title" : title,
 						"start" : start,
 						"end" : end
-					};
-					$.ajax({
+					}; */
+					/* $.ajax({
 						type : 'POST',
 						url : '/schedule/rest/deleteSchedule',
 						data : scheduleData,
@@ -172,51 +346,14 @@
 						error : function(e) {
 							alert('error: ', e)
 						}
-					});
+					}); */
 				}
 			},
 			aditable : true, //false로 변경시 draggable 작동 x
 			displayEventTime : false
-		// 시간 표시 x modal 표시로 작성한 부분
-
 		});
 		calendar.render();
-		//선택한 옵션이 변경되면 동적으로 일정관리 옵션 변경
-		/*         localeSelectorEl.addEventListener('change', function() {
-		 if (this.value) {
-		 calendar.setOption('locale', this.value);
-		 }
-		 });*/
 	});
-
-/* 	function allSave() {
-		var allEvent = calendar.getEvents();
-		var events = new Array();
-		for (var i = 0; i < allEvent.length; i++) {
-			var obj = new Object();
-			obj.title = allEvent[i]._def.title; //이벤트 명칭
-			obj.start = allEvent[i]._instance.range.start; //시작 날짜 및 시간
-			obj.end = allEvent[i]._instance.range.end;
-			events.push(obj);
-		}
-		var jsondata = JSON.stringify(events);
-
-		$.ajax({
-			type : 'POST',
-			url : '/schedule/rest/addLessonSchedule',
-			data : {
-				"alldata" : jsondata
-			},
-			dataType : 'text',
-			async : false, //==>동기
-			success : function(data) {
-				alert('일정 등록완료')
-			},
-			error : function(e) {
-				alert('error: ', e)
-			}
-		});
-	} */
 
 	function fncSelectTeacher(e) {
 		const p = [];
