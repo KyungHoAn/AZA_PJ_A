@@ -200,10 +200,8 @@
 						}
 						
 						let selectStartDate = startYear+'-'+startMonth+'-'+(startDay-1)
-						/* console.log(inputStartDate==selectStartDate) ok*/
 						
 						let selectEndDate = endYear+'-'+endMonth+'-'+(endDay-1)
-						/* console.log(inputEndDate == selectEndDate) ok */
 						
 						let defId = allEvent[i]._def.defId
 						if(allEvent[i]._def.title == content && inputStartDate==selectStartDate && inputEndDate == selectEndDate) {
@@ -236,13 +234,12 @@
 					/* console.log(Object.values(arg)); */
 					let obj = Object.values(arg)
 					console.log(obj[1]._def.title)
-					console.log(obj[1]._instance.range.start)
-					console.log(obj[1]._instance.range.end)
+					console.log(obj[1]._instance.range.start)	//22:06
+					console.log(obj[1]._instance.range.end)		//22:07
 					var allEvent = calendar.getEvents();
 					/* let title = allEvent[0]._def.title;
 					let start = allEvent[0]._instance.range.start;
 					let end = allEvent[0]._instance.range.end; */	
-					
 					
 					
 					// ¹Ø¿¡ delete ¼öÁ¤ ing..
