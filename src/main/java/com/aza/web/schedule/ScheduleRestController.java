@@ -47,7 +47,6 @@ public class ScheduleRestController {
 	int pageSize;
 	
 	public ScheduleRestController() {
-		// TODO Auto-generated constructor stub
 		System.out.println(this.getClass());
 	}
 	
@@ -85,7 +84,8 @@ public class ScheduleRestController {
 		try {
 			String teacherId = ((User) session.getAttribute("user")).getUserId();
 			map.put("teacherID", teacherId);
-			lessonService.deleteLessonSchedule(map);
+			System.out.println("map:: "+map);
+//			lessonService.deleteLessonSchedule(map);
 			map.put("success", true);
 		} catch(Exception e) {
 			map.put("success", false);

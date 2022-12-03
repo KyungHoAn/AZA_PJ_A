@@ -229,40 +229,30 @@
 			eventClick : function(arg) {
 				if (confirm('이벤트를 지우겠습니까?')) {
 					arg.event.remove()
-					console.log(JSON.stringify(arg, null, "\t"))
-					console.log('-----')
 					/* console.log(Object.values(arg)); */
 					let obj = Object.values(arg)
+					/* console.log(arg)
 					console.log(obj[1]._def.title)
 					console.log(obj[1]._instance.range.start)	//22:06
-					console.log(obj[1]._instance.range.end)		//22:07
-					var allEvent = calendar.getEvents();
-					/* let title = allEvent[0]._def.title;
-					let start = allEvent[0]._instance.range.start;
-					let end = allEvent[0]._instance.range.end; */	
+					console.log(obj[1]._instance.range.end)		//22:07 */
+					let title = obj[1]._def.title;
+					let start = obj[1]._instance.range.start;
+					let end = obj[1]._instance.range.end;
 					
 					
-					// 밑에 delete 수정 ing..
-					
-					let startTime = allEvent[i]._instance.range.start.toString()
+					let startTime = obj[1]._instance.range.start.toString()
 					let sMonth = startTime.substr(3,4)	// month
 					let yearT = startTime.substr(10,11)
 					let [startTime1, startYear] = yearT.split(' ')		//year
 					let dayY = startTime.substr(7,8)
 					let [startYear2, startDay] = dayY.split(' ')		// day
-					/* console.log('----')
-					console.log(startDay)		//??? +1 error
-					console.log('----') */
 					
-					let endTime = allEvent[i]._instance.range.end.toString()
+					let endTime = obj[1]._instance.range.end.toString()
 					let eMonth = endTime.substr(3,4)		//month
 					let endT = endTime.substr(10,11)
 					let [endTime1, endYear] = endT.split(' ')	// endYear
 					let dayY2 = endTime.substr(7,8)
 					let [endYear2, endDay] = dayY2.split(' ')		//endDay
-					
-					let inputStartDate = start_date.substr(0,10)	// year-month-day
-					let inputEndDate = end_date.substr(0,10)		// year-month-day
 					
 					// month 치환 Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec
 					let startMonth;
@@ -320,20 +310,18 @@
 					}
 					
 					let selectStartDate = startYear+'-'+startMonth+'-'+(startDay-1)
-					/* console.log(inputStartDate==selectStartDate) ok*/
+					console.log(selectStartDate)
 					
 					let selectEndDate = endYear+'-'+endMonth+'-'+(endDay-1)
-					/* console.log(inputEndDate == selectEndDate) ok */
+					console.log(selectEndDate)
+					console.log(title)
 					
-					
-					
-					
-					/* let scheduleData = {
+					let scheduleData = {
 						"title" : title,
-						"start" : start,
-						"end" : end
-					}; */
-					/* $.ajax({
+						"start" : selectStartDate,
+						"end" : selectEndDate
+					};
+					$.ajax({
 						type : 'POST',
 						url : '/schedule/rest/deleteSchedule',
 						data : scheduleData,
@@ -343,7 +331,7 @@
 						error : function(e) {
 							alert('error: ', e)
 						}
-					}); */
+					});
 				}
 			},
 			aditable : true, //false로 변경시 draggable 작동 x
