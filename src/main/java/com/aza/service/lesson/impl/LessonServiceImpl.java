@@ -188,35 +188,22 @@ public class LessonServiceImpl implements LessonService {
 	
 	@Override
 	public void addLessonSchedule(Schedule schedule) throws Exception {
-		// TODO Auto-generated method stub
 		lessonDao.addLessonSchedule(schedule);
 	}
 
 	@Override
 	public Schedule getLessonSchedule(int scheduleCode) throws Exception {
-		// TODO Auto-generated method stub
 		return lessonDao.getLessonSchedule(scheduleCode);
 	}
 
 	@Override
 	public void updateLessonSchedule(Schedule schedule) throws Exception {
-		// TODO Auto-generated method stub
 		lessonDao.updateLessonSchedule(schedule);
 	}
 
 	@Override
-	public void deleteLessonSchedule(Map<String, Object> result) throws Exception {
-		// TODO Auto-generated method stub 
-		// teacherID=teacher1
-		System.out.println("reuslt: "+result);
-		//title=test
-		//start=Wed Nov 23 2022 23:55:00 GMT+0900 (), 
-		// 2022-11-23T05:55:00.000Z
-		//end=Thu Nov 24 2022 00:55:00 GMT+0900 ()}
-		//lessonDao.deleteLessonSchedule(scheduleCode);
-		
-		// next ->  mapper에 값 전송하기
-		//lessonDao.delete
+	public void deleteLessonSchedule(Schedule schedule) throws Exception {
+		lessonDao.deleteLessonSchedule(schedule);
 	}
 
 	@Override
@@ -229,12 +216,6 @@ public class LessonServiceImpl implements LessonService {
 		map.put("list", list);
 		map.put("totalCount", new Integer(totalCount));
 		return map;
-	}
-
-	@Override
-	public void deteteLessonScheduleAll(String teacherId) throws Exception {
-		// TODO Auto-generated method stub
-		lessonDao.deteteLessonScheduleAll(teacherId);
 	}
 	
 	@Override

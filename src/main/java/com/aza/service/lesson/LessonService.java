@@ -66,7 +66,7 @@ public interface LessonService {
 	public void updateLessonSchedule(Schedule schedule) throws Exception;
 
 	// schedule : delete
-	public void deleteLessonSchedule(Map<String, Object> map) throws Exception;
+	public void deleteLessonSchedule(Schedule schedule) throws Exception;
 
 	// schedule : list teacher
 	public Map<String, Object> listLessonScheduleTeacher(Search search, String teacherId) throws Exception;
@@ -74,10 +74,7 @@ public interface LessonService {
 	//schedule : lsit students
 	public Map<String, Object> listLessonScheduleStudent(Search search, String studentId) throws Exception;
 	
-	public Map<String, Object> listLessonScheduleParent(Search search, String parentId) throws Exception; 
-	
-	//schedule : all delete
-	public void deteteLessonScheduleAll(String teacherId) throws Exception;
+	public Map<String, Object> listLessonScheduleParent(Search search, String parentId) throws Exception;
 
 	public Map<String, Object> listLessonSelectTeacher(Search search, String studentId) throws Exception;
 

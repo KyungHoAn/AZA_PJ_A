@@ -278,11 +278,6 @@ public class LessonDaoImpl implements LessonDao {
 
 		return sqlSessionTemplate.selectOne("ScheduleMapper.getlistLessonScheduleParentTotalCount",search);
 	}
-	
-	@Override
-	public void deteteLessonScheduleAll(String teacherId) throws Exception {
-		sqlSessionTemplate.delete("ScheduleMapper.deleteAll",teacherId);
-	}
 
 	@Override
 	public List<Schedule> listLessonSelectTeacher(Search search, String studentId) throws Exception {
@@ -294,5 +289,12 @@ public class LessonDaoImpl implements LessonDao {
 	public int getlistLessonSelectTeacherTotalCount(Search search, String searchKeyword) throws Exception {
 		search.setSearchKeyword(searchKeyword);
 		return sqlSessionTemplate.selectOne("ScheduleMapper.getlistLessonSelectTeacherTotalCount",search);
+	}
+
+	@Override
+	public void deleteLessonSchedule(Schedule schedule) throws Exception {
+		System.out.println("-------");
+		System.out.println("::::"+ schedule);
+		sqlSessionTemplate.delete("ScheduleMapper.deleteSchedule", schedule);
 	}
 }

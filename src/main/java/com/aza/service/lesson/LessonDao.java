@@ -2,6 +2,7 @@ package com.aza.service.lesson;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,7 +81,7 @@ public interface LessonDao {
 	public void updateLessonSchedule(Schedule schedule) throws Exception;
 	
 	//schedule : delete
-//	public void deleteLessonSchedule(int scheudleCode) throws Exception;
+	public void deleteLessonSchedule(Schedule schedule) throws Exception;
 	
 	//schedule : listTeacher
 	public List<Schedule> listLessonScheduleTeacher(Search search, String teacherId) throws Exception;
@@ -91,9 +92,6 @@ public interface LessonDao {
 	public List<Schedule> listLessonSelectTeacher(Search search, String studentId) throws Exception;
 	
 	public List<Schedule> listLessonScheduleParent(Search search, String parentId) throws Exception;
-	
-	//schedule : delete all
-	public void deteteLessonScheduleAll(String teacherId) throws Exception;
 	
 	public int getLessonScheduleTotalCount(Search search, String searchKeyword) throws Exception;
 	

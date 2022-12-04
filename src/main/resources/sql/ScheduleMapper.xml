@@ -131,12 +131,12 @@
 		        ) countTable
 	</select>
 	
-	<delete id="deleteSchedule" parameterType="map">
+	<delete id="deleteSchedule">
 		DELETE FROM schedule
-		WHERE teacher_id=#{teacher_id} 
-		AND schedule_title = #{title} 
-		AND schedule_start_time = #{start}
-		AND sceedule_end_time = #{end}
+		WHERE teacher_id = #{teacherId} 
+		AND schedule_title = #{title:VARCHAR} 
+		AND schedule_start_time LIKE '#{start:VARCHAR}%'
+		AND schedule_end_time LIKE '#{end:VARCHAR}%'
 	</delete>
 	
 </mapper>

@@ -81,11 +81,18 @@ public class ScheduleRestController {
 	@PostMapping(value = "deleteSchedule")
 	@ResponseBody
 	public void deleteSchedule(@RequestParam Map<String, Object> map, HttpSession session, HttpServletRequest req, HttpServletResponse res) throws Exception {
+		Schedule schedule = new Schedule();
 		try {
 			String teacherId = ((User) session.getAttribute("user")).getUserId();
+			String start = (String)map.get("start");
+			String end = (String)map.get("end");
+			String title = (String)map.get("title");
+			schedule.setStart(start);
+			schedule.setEnd(end);
+			schedule.setTeacherId(teacherId);
+			schedule.setTitle(title);
 			map.put("teacherID", teacherId);
-			System.out.println("map:: "+map);
-//			lessonService.deleteLessonSchedule(map);
+			lessonService.deleteLessonSchedule(schedule);
 			map.put("success", true);
 		} catch(Exception e) {
 			map.put("success", false);
