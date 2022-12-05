@@ -132,11 +132,11 @@
 	</select>
 	
 	<delete id="deleteSchedule">
-		DELETE FROM schedule
-		WHERE teacher_id = #{teacherId} 
-		AND schedule_title = #{title:VARCHAR} 
-		AND schedule_start_time LIKE '#{start:VARCHAR}%'
-		AND schedule_end_time LIKE '#{end:VARCHAR}%'
+		DELETE FROM schedule 
+		WHERE teacher_id = #{teacherId}
+		AND schedule_title = #{title}
+		AND schedule_start_time like '#{start}%'
+		AND schedule_end_time like '#{end}%'
 	</delete>
 	
 </mapper>
